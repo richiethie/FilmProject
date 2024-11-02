@@ -19,7 +19,7 @@ const Hero = () => {
                 <div className="text-center text-white">
                     <h1 className="text-4xl font-bold drop-shadow-md">Share Your Stories in Minutes</h1> {/* Added drop-shadow */}
                     <p className="mt-4 text-lg drop-shadow-md">Connect with a community of filmmakers and showcase your short films.</p> {/* Added drop-shadow */}
-                    <a href="#upload" className="mt-6 inline-block bg-burntOrange text-white px-6 py-3 rounded">Get Started</a>
+                    <a href="#upload" className="mt-6 inline-block bg-cornflowerBlue hover:bg-steelGray text-white px-6 py-3 rounded">Get Started</a>
                 </div>
             </div>
         </section>
