@@ -1,0 +1,36 @@
+/* swiperStyles.css */
+
+.custom-swiper-button {
+    color: #A3ABB5; /* Steel Gray color */
+    width: 40px; /* Adjust width */
+    height: 100px; /* Adjust height */
+    background-color: transparent; /* Make background transparent */
+    border: none; /* Remove border */
+     /* Make buttons circular */
+    display: flex; /* Flex for centering */
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    position: absolute; /* Position absolutely */
+    z-index: 10; /* Make sure it's above other elements */
+}
+
+.custom-swiper-button:hover {
+    background-color: rgba(102, 110, 121, 0.2); /* Add hover effect */
+}
+
+/* Position the left button */
+
+.custom-swiper-button-left,
+.custom-swiper-button-right {
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust position to be centered */
+}
+
+.swiper-pagination-bullet {
+    background-color: #64696e; /* Your steelGray color */
+    opacity: 1; /* Ensure the color is fully opaque */
+}
+
+.swiper-pagination-bullet-active {
+    background-color: #f9f9f9; /* Your steelGray color for the active dot */
+}
