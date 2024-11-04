@@ -5,6 +5,7 @@ import Upload from './pages/Upload';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Video from './pages/Video';
+import Feed from './pages/Feed';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/video/:id" element={<Video />} />
+            <Route path="/feed" element={<Feed />} />
             {/* Add additional routes as needed */}
           </Routes>
         </main>
