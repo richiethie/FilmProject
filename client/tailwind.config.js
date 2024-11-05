@@ -10,7 +10,7 @@ export default {
         montserrat: ['Montserrat', 'sans-serif'],
       },
       colors: {
-        charcoal: '#1f2b37',
+        charcoal: '#10161c',
         cornflowerBlue: '#4f76f6',
         crispWhite: '#f9f9f9',
         mintGreen: '#77f2a1',

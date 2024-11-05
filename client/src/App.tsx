@@ -6,6 +6,9 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Video from './pages/Video';
 import Feed from './pages/Feed';
+import Explore from './pages/Explore';
+import Alerts from './pages/Alerts';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/video/:id" element={<Video />} />
             <Route path="/feed" element={<Feed />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/alerts" element={<Alerts />} />
+            <Route path="/profile" element={<Profile />} />
             {/* Add additional routes as needed */}
           </Routes>
         </main>
