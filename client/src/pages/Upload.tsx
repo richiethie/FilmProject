@@ -7,6 +7,14 @@ import UploadModalStepTwo from '../components/UploadModalStepTwo';
 import UploadModalStepThree from '../components/UploadModalStepThree';
 import ProgressBar from '../components/ProgressBar';
 
+interface Video {
+    title: string;
+    thumbnailUrl: string;
+    genre: string;
+    series: string;
+    visibility: string;
+}
+
 const Upload = () => {
     const [isModalOpen, setIsModalOpen] = useState(true);
     const [step, setStep] = useState(1);
@@ -19,6 +27,9 @@ const Upload = () => {
     const [isCreatingNewSeries, setIsCreatingNewSeries] = useState(false); // State to toggle new series input
     const [genre, setGenre] = useState('');
     const [visibility, setVisibility] = useState('private'); // State for visibility
+
+    // New state to store the list of uploaded videos
+    const [videos, setVideos] = useState<Video[]>([]);
 
     const handleSeriesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const value = e.target.value;
@@ -82,8 +93,15 @@ const Upload = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Logic to handle final submission
-        console.log({ file, title, description, thumbnail, visibility });
+        // Add the new video to the videos list
+        const newVideo: Video = {
+            title,
+            thumbnailUrl: thumbnailUrl || '',
+            genre,
+            series,
+            visibility
+        };
+        setVideos([...videos, newVideo]);
         closeModal(); // Close modal after submission
     };
     
@@ -97,7 +115,29 @@ const Upload = () => {
                 >
                     Upload
                 </button>
+                
+                {/* Render the list of videos */}
+                <div className="mt-8">
+                    {videos.map((video, index) => (
+                        <div key={index} className="flex items-center border-b border-steelGray p-4 mb-4">
+                            <div className='h-full'>
+                                <img 
+                                    src={video.thumbnailUrl} 
+                                    alt={video.title} 
+                                    className="aspect-w-16 aspect-h-9 max-h-16 object-cover rounded-md mr-4"
+                                />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-lg">{video.title}</h3>
+                                <p className="text-sm text-gray-400">Genre: {video.genre}</p>
+                                <p className="text-sm text-gray-400">Series: {video.series}</p>
+                                <p className="text-sm text-gray-400 capitalize">{video.visibility}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
 
+                {/* Upload Modal */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
                         <div className="bg-charcoal rounded-lg p-8 w-[30%] h-[80%] shadow-lg relative">
@@ -119,7 +159,7 @@ const Upload = () => {
                                     stepTitles={['Upload File', 'Set Details', 'Visibility']}
                                 />
                             </div>
-                            <div className='flex h-[90%] w-full items-center justify-center'>
+                            <div className='flex h-[90%] w-full items-center justify-center overflow-y-auto max-h-full'>
                                 {/* Modal Content */}
                                 {step === 1 ? (
                                     <UploadModalStepOne 

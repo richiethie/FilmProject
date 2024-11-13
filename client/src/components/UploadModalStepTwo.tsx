@@ -129,7 +129,7 @@ const UploadModalStepTwo = (props: UploadModalStepTwoProps) => {
                         required
                     >
                         <option value="" disabled>
-                            Select a series
+                            Select a genre
                         </option>
                         {genres.map((option) => (
                             <option key={option} value={option}>
