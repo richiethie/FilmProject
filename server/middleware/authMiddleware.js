@@ -1,11 +1,17 @@
 const jwt = require('jsonwebtoken');
 
 const auth = (req, res, next) => {
-  const token = req.header('Authorization');
+  const token = req.header('Authorization')?.split(' ')[1];
+  console.log(token)
   if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('Decoded token:', decoded);
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (decoded.exp < currentTime) {
+      return res.status(401).json({ message: 'Token has expired' });
+    }
     req.user = decoded.id;
     next();
   } catch (err) {

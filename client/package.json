@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@types/swiper": "^6.0.0",
+    "aws-sdk": "^2.1692.0",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "jwt-decode": "^4.0.0",

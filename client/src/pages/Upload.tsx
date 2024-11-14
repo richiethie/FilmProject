@@ -6,13 +6,21 @@ import UploadModalStepOne from '../components/UploadModalStepOne';
 import UploadModalStepTwo from '../components/UploadModalStepTwo';
 import UploadModalStepThree from '../components/UploadModalStepThree';
 import ProgressBar from '../components/ProgressBar';
+import axios from 'axios'; // Make sure to import axios for API calls
+import { useAuth } from '../context/AuthContext';
 
-interface Video {
+interface Film {
     title: string;
+    description: string;
     thumbnailUrl: string;
+    filmUrl: string; // URL or path to the film file
     genre: string;
     series: string;
-    visibility: string;
+    duration: number; // Duration in minutes
+    rank: number | null;
+    votes: number;
+    visibility: 'private' | 'unlisted' | 'public';
+    uploadedBy: string; // Assuming you handle user authentication and pass the user ID
 }
 
 const Upload = () => {
@@ -26,10 +34,15 @@ const Upload = () => {
     const [series, setSeries] = useState(''); // State for the selected series
     const [isCreatingNewSeries, setIsCreatingNewSeries] = useState(false); // State to toggle new series input
     const [genre, setGenre] = useState('');
-    const [visibility, setVisibility] = useState('private'); // State for visibility
+    const [visibility, setVisibility] = useState<'private' | 'unlisted' | 'public'>('private'); // State for visibility
+    const [duration, setDuration] = useState(0); // Duration in minutes
+    const [rank, setRank] = useState<number | null>(null); // Rank for the film
+    const [votes, setVotes] = useState(0); // Default votes count
+    const [filmUrl, setFilmUrl] = useState<string>("");
 
-    // New state to store the list of uploaded videos
-    const [videos, setVideos] = useState<Video[]>([]);
+    const [films, setFilms] = useState<Film[]>([]); // New state to store the list of uploaded films
+
+    const { userId, token } = useAuth();
 
     const handleSeriesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const value = e.target.value;
@@ -88,23 +101,73 @@ const Upload = () => {
     };
 
     const handleVisibilityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setVisibility(e.target.value);
+        setVisibility(e.target.value as 'private' | 'unlisted' | 'public');
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDuration(Number(e.target.value));
+    };
+
+    const handleRankChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setRank(Number(e.target.value));
+    };
+
+    // Submit the form and send data to the backend API
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Add the new video to the videos list
-        const newVideo: Video = {
+    
+        const filmData = {
             title,
-            thumbnailUrl: thumbnailUrl || '',
+            description,
             genre,
             series,
-            visibility
+            visibility,
+            duration,
+            rank: rank ? rank : null, // Set rank to null if not provided
+            votes,
+            filmUrl,
+            thumbnailUrl: thumbnailUrl || '', // Send empty string if no thumbnail URL
+            uploadedBy: userId || '', // Replace with actual user ID
         };
-        setVideos([...videos, newVideo]);
-        closeModal(); // Close modal after submission
-    };
     
+        console.log("Film data being sent:", filmData);
+    
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/films/upload`,
+                filmData, // Send the data as JSON
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json', // Specify that the content is JSON
+                    },
+                }
+            );
+    
+            console.log('Film uploaded successfully:', response.data);
+    
+            // Update the films list after submission
+            const newFilm: Film = {
+                title,
+                description,
+                thumbnailUrl: thumbnailUrl || '',
+                filmUrl,
+                genre,
+                series,
+                duration,
+                rank,
+                votes,
+                visibility,
+                uploadedBy: userId || '',
+            };
+            setFilms([...films, newFilm]);
+    
+            closeModal(); // Close modal after submission
+        } catch (error) {
+            console.error('Error uploading film:', error);
+        }
+    };
+
     return (
         <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
             <LeftFeedNav />
@@ -116,22 +179,22 @@ const Upload = () => {
                     Upload
                 </button>
                 
-                {/* Render the list of videos */}
+                {/* Render the list of films */}
                 <div className="mt-8">
-                    {videos.map((video, index) => (
+                    {films.map((film, index) => (
                         <div key={index} className="flex items-center border-b border-steelGray p-4 mb-4">
                             <div className='h-full'>
                                 <img 
-                                    src={video.thumbnailUrl} 
-                                    alt={video.title} 
+                                    src={film.thumbnailUrl} 
+                                    alt={film.title} 
                                     className="aspect-w-16 aspect-h-9 max-h-16 object-cover rounded-md mr-4"
                                 />
                             </div>
                             <div>
-                                <h3 className="font-bold text-lg">{video.title}</h3>
-                                <p className="text-sm text-gray-400">Genre: {video.genre}</p>
-                                <p className="text-sm text-gray-400">Series: {video.series}</p>
-                                <p className="text-sm text-gray-400 capitalize">{video.visibility}</p>
+                                <h3 className="font-bold text-lg">{film.title}</h3>
+                                <p className="text-sm text-gray-400">Genre: {film.genre}</p>
+                                <p className="text-sm text-gray-400">Series: {film.series}</p>
+                                <p className="text-sm text-gray-400 capitalize">{film.visibility}</p>
                             </div>
                         </div>
                     ))}
@@ -166,6 +229,7 @@ const Upload = () => {
                                         file={file}
                                         handleFileChange={handleFileChange}
                                         handleNext={handleNext}
+                                        setFilmUrl={setFilmUrl}
                                     />
                                 ) : step === 2 ? (
                                     <UploadModalStepTwo 
@@ -177,12 +241,12 @@ const Upload = () => {
                                         isCreatingNewSeries={isCreatingNewSeries}
                                         genre={genre}
                                         setGenre={setGenre}
+                                        setThumbnailUrl={setThumbnailUrl}
                                         handleTitleChange={handleTitleChange}
                                         handleDescriptionChange={handleDescriptionChange}
                                         handleThumbnailChange={handleThumbnailChange}
                                         handleSeriesChange={handleSeriesChange}
                                         handleNewSeriesChange={handleNewSeriesChange}
-                                        handleSubmit={handleSubmit}
                                         handlePrevious={handlePrevious}
                                         handleNext={handleNext}
                                     />
@@ -194,6 +258,11 @@ const Upload = () => {
                                         handleSubmit={handleSubmit}
                                         thumbnailUrl={thumbnailUrl}
                                         title={title}
+                                        description={description}
+                                        genre={genre}
+                                        isCreatingNewSeries={isCreatingNewSeries}
+                                        series={series}
+                                        thumbnail={thumbnail}
                                     />
                                 )}
                             </div>

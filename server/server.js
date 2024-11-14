@@ -18,9 +18,10 @@ const corsOptions = {
   origin: 'http://localhost:5173', // Adjust this based on where your frontend is hosted
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 };
 app.use(cors(corsOptions));
-app.use(express.json()); // Parse incoming JSON requests
+app.use(express.json({ limit: '50mb' })); // Parse incoming JSON requests
 
 // Routes
 app.use('/api/users', userRoutes);

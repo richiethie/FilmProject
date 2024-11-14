@@ -16,7 +16,7 @@ interface Film {
     rank: number | null;
     visibility: 'private' | 'unlisted' | 'public';
     votes: number;
-    uploadedBy: string;
+    uploadedBy: { username: string; email: string; _id: string };
     createdAt: Date;
 }
 
@@ -87,7 +87,7 @@ const Profile = () => {
                                         <div className="p-4 flex justify-between items-center">
                                             <div className="flex flex-col">
                                                 <h3 className="text-xl font-bold">{film.title}</h3>
-                                                <p className="text-sm text-gray-400">by {film.uploadedBy}</p>
+                                                <p className="text-sm text-gray-400">by {film.uploadedBy?.username}</p>
                                             </div>
                                             <div className="flex flex-col items-end">
                                                 <p className="text-sm text-gray-400">{film.votes} votes</p>
