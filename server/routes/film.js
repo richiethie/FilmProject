@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { uploadFilm, getFilms, getUserFilms, uploadToS3, uploadThumbnailToS3 } = require('../controllers/filmController');
+const { uploadFilm, getFilms, getUserFilms, uploadToS3, uploadThumbnailToS3, deleteFilm } = require('../controllers/filmController');
 const auth = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
@@ -10,5 +10,6 @@ router.post('/upload-thumbnail-to-s3', auth, upload.single('thumbnail'), uploadT
 router.post('/upload', auth, uploadFilm);
 router.get('/', getFilms);
 router.get('/user/:userId', getUserFilms);
+router.delete('/delete/:filmId', auth, deleteFilm);
 
 module.exports = router;

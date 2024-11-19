@@ -1,4 +1,3 @@
-// uploadMiddleware.js
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
@@ -13,9 +12,11 @@ const s3 = new AWS.S3({
 
 // File filter to only allow video and image files
 const fileFilter = (req, file, cb) => {
+  console.log(`Processing file: ${file.originalname} of type ${file.mimetype}`);
   if (file.mimetype.startsWith('video/') || file.mimetype.startsWith('image/')) {
     cb(null, true); // Accept file
   } else {
+    console.error('Invalid file type:', file.mimetype);
     cb(new Error('Invalid file type. Only video and image files are allowed'), false); // Reject file
   }
 };
@@ -26,8 +27,20 @@ const upload = multer({
     s3: s3,
     bucket: process.env.AWS_S3_BUCKET_NAME,
     key: function (req, file, cb) {
-      const fileType = file.fieldname === 'file' ? 'films' : 'thumbnails'; // Determine directory based on field name
-      cb(null, `${fileType}/${uuidv4()}-${file.originalname}`); // Generate unique file name
+      // Determine the directory based on the fieldname
+      let fileType;
+      if (file.fieldname === 'file') {
+        fileType = 'films'; // For video or film uploads
+      } else if (file.fieldname === 'thumbnail') {
+        fileType = 'thumbnails'; // For thumbnail images
+      } else if (file.fieldname === 'profilePicture') {
+        fileType = 'profile-pictures'; // For profile picture uploads
+      } else {
+        fileType = 'uploads'; // Default folder for other files
+      }
+
+      // Generate a unique file name for each upload
+      cb(null, `${fileType}/${uuidv4()}-${file.originalname}`);
     },
   }),
   fileFilter: fileFilter,

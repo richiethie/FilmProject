@@ -5,6 +5,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import UploadModalStepOne from '../components/UploadModalStepOne';
 import UploadModalStepTwo from '../components/UploadModalStepTwo';
 import UploadModalStepThree from '../components/UploadModalStepThree';
+import UploadFilmList from '../components/UploadFilmList';
 import ProgressBar from '../components/ProgressBar';
 import axios from 'axios'; // Make sure to import axios for API calls
 import { useAuth } from '../context/AuthContext';
@@ -24,7 +25,7 @@ interface Film {
 }
 
 const Upload = () => {
-    const [isModalOpen, setIsModalOpen] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [step, setStep] = useState(1);
     const [file, setFile] = useState<File | null>(null);
     const [title, setTitle] = useState('');
@@ -172,33 +173,20 @@ const Upload = () => {
         <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
             <LeftFeedNav />
             <main className="flex-grow container max-w-[60%] mx-auto px-4 py-8">
-                <button
-                    onClick={openModal}
-                    className="bg-cornflowerBlue text-charcoal font-bold py-2 px-6 rounded-md hover:bg-opacity-90 transition"
-                >
-                    Upload
-                </button>
+                <div className='flex justify-between items-center'>
+                    <h2 className='text-xl font-semibold'>Creator <span className='text-cornflowerBlue'>Studio</span></h2>
+                    <button
+                        onClick={openModal}
+                        className="bg-cornflowerBlue text-charcoal font-bold py-2 px-4 rounded-md hover:bg-opacity-90 transition"
+                    >
+                        Upload
+                    </button>
+                </div>
                 
                 {/* Render the list of films */}
-                <div className="mt-8">
-                    {films.map((film, index) => (
-                        <div key={index} className="flex items-center border-b border-steelGray p-4 mb-4">
-                            <div className='h-full'>
-                                <img 
-                                    src={film.thumbnailUrl} 
-                                    alt={film.title} 
-                                    className="aspect-w-16 aspect-h-9 max-h-16 object-cover rounded-md mr-4"
-                                />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-lg">{film.title}</h3>
-                                <p className="text-sm text-gray-400">Genre: {film.genre}</p>
-                                <p className="text-sm text-gray-400">Series: {film.series}</p>
-                                <p className="text-sm text-gray-400 capitalize">{film.visibility}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <UploadFilmList 
+                    handleSubmit={handleSubmit}
+                />
 
                 {/* Upload Modal */}
                 {isModalOpen && (

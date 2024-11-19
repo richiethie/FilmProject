@@ -22,26 +22,26 @@ const LeftFeedNav = () => {
             <div>
                 <Link to="/feed" className="top-10 mb-8 text-3xl font-bold">Film<span className="text-cornflowerBlue">Share</span></Link>
                 <ul className="space-y-4 flex flex-col items-start mt-8">
-                    <li className="flex justify-center items-center hover:text-cornflowerBlue py-2">
+                    <Link to="/feed" className="flex justify-center items-center hover:text-cornflowerBlue py-2">
                         <GoHomeFill className='text-3xl'/>
-                        <Link to="/feed" className='text-xl font-semibold ml-4'>Home</Link>
-                    </li>
-                    <li className="flex justify-center items-center hover:text-cornflowerBlue py-2">
+                        <li  className='text-xl font-semibold ml-4'>Home</li>
+                    </Link>
+                    <Link to="/explore" className="flex justify-center items-center hover:text-cornflowerBlue py-2">
                         <IoSearch className='text-3xl'/>
-                        <Link to="/explore" className='text-xl font-semibold ml-4'>Explore</Link>
-                    </li>
-                    <li className="flex justify-center items-center hover:text-cornflowerBlue py-2">
+                        <li  className='text-xl font-semibold ml-4'>Explore</li>
+                    </Link>
+                    <Link to="/alerts" className="flex justify-center items-center hover:text-cornflowerBlue py-2">
                         <IoNotifications className='text-3xl'/>
-                        <Link to="/alerts" className='text-xl font-semibold ml-4'>Alerts</Link>
-                    </li>
-                    <li className="flex justify-center items-center hover:text-cornflowerBlue py-2">
+                        <li  className='text-xl font-semibold ml-4'>Alerts</li>
+                    </Link>
+                    <Link to="/upload" className="flex justify-center items-center hover:text-cornflowerBlue py-2">
                         <FaUpload className='text-3xl'/>
-                        <Link to="/upload" className='text-xl font-semibold ml-4'>Upload</Link>
-                    </li>
-                    <li className="flex justify-center items-center hover:text-cornflowerBlue py-2">
+                        <li  className='text-xl font-semibold ml-4'>Upload</li>
+                    </Link>
+                    <Link to="/profile" className="flex justify-center items-center hover:text-cornflowerBlue py-2">
                         <CgProfile className='text-3xl'/>
-                        <Link to="/profile" className='text-xl font-semibold ml-4'>Profile</Link>
-                    </li>
+                        <li  className='text-xl font-semibold ml-4'>Profile</li>
+                    </Link>
                     {/* Add more navigation items as needed */}
                 </ul>
             </div>

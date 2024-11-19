@@ -108,3 +108,42 @@ exports.getUserFilms = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+
+exports.deleteFilm = async (req, res) => {
+  const { filmId } = req.params;
+  console.log(req.params)
+
+  try {
+    // Find the film by ID
+    const film = await Film.findById(filmId);
+
+    if (!film) {
+      return res.status(404).json({ message: 'Film not found' });
+    }
+
+    // If film exists, delete the film file from S3 (optional, based on your use case)
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME, // S3 Bucket name
+      Key: film.filmUrl, // The path to the file in the S3 bucket
+    };
+
+    await s3.deleteObject(params).promise();
+
+    // If film has a thumbnail, delete that from S3 as well
+    if (film.thumbnailUrl) {
+      const thumbnailParams = {
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: film.thumbnailUrl,
+      };
+      await s3.deleteObject(thumbnailParams).promise();
+    }
+
+    // Delete the film from the database
+    await film.deleteOne();
+
+    return res.status(200).json({ message: 'Film deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
