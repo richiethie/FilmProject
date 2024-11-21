@@ -9,6 +9,7 @@ import Feed from './pages/Feed';
 import Explore from './pages/Explore';
 import Alerts from './pages/Alerts';
 import Profile from './pages/Profile';
+import Watch from './pages/Watch';
 import ProtectedRoute from './utils/ProtectedRoute';
 
 function App() {
@@ -68,6 +69,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/films/:id" 
+              element={
+                <ProtectedRoute>
+                  <Watch />
                 </ProtectedRoute>
               } 
             />

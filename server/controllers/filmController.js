@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const Film = require('../models/Film');
 const { v4: uuidv4 } = require('uuid');
+const mongoose = require('mongoose');
 
 // Initialize AWS S3
 const s3 = new AWS.S3({
@@ -88,6 +89,26 @@ exports.getFilms = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error fetching films', error: err.message });
+  }
+};
+
+exports.getFilmById = async (req, res) => {
+  const { id } = req.params;
+
+  // Check if the ID is a valid MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid Film ID' });
+  }
+
+  try {
+      const film = await Film.findById(id);
+      if (!film) {
+          return res.status(404).json({ message: 'Film not found' });
+      }
+      res.json(film);
+  } catch (error) {
+      console.error('Error fetching film:', error);
+      res.status(500).json({ message: 'Server error', error });
   }
 };
 
