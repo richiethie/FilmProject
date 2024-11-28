@@ -1,7 +1,10 @@
 const AWS = require('aws-sdk');
 const Film = require('../models/Film');
+const User = require('../models/User')
 const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
+const { createNotification } = require('../utils/notifications');
+const Notification = require('../models/Notification');
 
 // Initialize AWS S3
 const s3 = new AWS.S3({
@@ -94,14 +97,13 @@ exports.getFilms = async (req, res) => {
 
 exports.getFilmById = async (req, res) => {
   const { id } = req.params;
-
   // Check if the ID is a valid MongoDB ObjectId
   if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid Film ID' });
   }
 
   try {
-      const film = await Film.findById(id);
+      const film = await Film.findById(id).populate('uploadedBy', 'username');
       if (!film) {
           return res.status(404).json({ message: 'Film not found' });
       }
@@ -116,16 +118,23 @@ exports.getFilmById = async (req, res) => {
 exports.getUserFilms = async (req, res) => {
   try {
     const { userId } = req.params;
+    console.log("User ID received in params:", userId);
 
-    const films = await Film.find({ uploadedBy: userId }).populate('uploadedBy', 'username email');
-    
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: 'Invalid user ID format' });
+    }
+
+    const films = await Film.find({ uploadedBy: new mongoose.Types.ObjectId(userId) }).populate('uploadedBy', 'username');
+
+    console.log('Films found:', films);
+
     if (films.length === 0) {
       return res.status(404).json({ message: 'No films found for this user.' });
     }
 
     res.status(200).json(films);
   } catch (err) {
-    console.error(err);
+    console.error('Error fetching films:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
@@ -168,3 +177,140 @@ exports.deleteFilm = async (req, res) => {
     return res.status(500).json({ message: 'Server error' });
   }
 };
+
+exports.voteFilm = async (req, res) => {
+  try {
+    const { filmId } = req.params;
+    const userId = req.user; // Ensure `req.user.id` has the proper user ID
+    const { isUpvote } = req.body; // Whether it's an upvote (true) or a downvote (false)
+
+    // Fetch film details
+    const film = await Film.findById(filmId).populate('uploadedBy'); // Populate the uploadedBy field to get the film owner
+    if (!film) {
+      return res.status(404).json({ message: 'Film not found' });
+    }
+
+    // Ensure votes field is initialized to an empty array if not present
+    if (!Array.isArray(film.votes)) {
+      film.votes = [];
+    }
+
+    // Check if the user has already voted
+    const userHasVoted = film.votes.includes(userId);
+
+    if (isUpvote) {
+      // If the user is upvoting and hasn't voted yet, add their userId to the array
+      if (!userHasVoted) {
+        film.votes.push(userId);
+      }
+
+      // Create a notification for the film owner (uploadedBy)
+      const filmOwnerId = film.uploadedBy._id; // Get the film owner's ID
+      // Avoid sending a notification to the user who voted
+      // if (filmOwnerId.toString() !== userId.toString()) {
+        await createNotification('Vote', filmOwnerId, userId, filmId); // Notify the film owner about the vote
+      //}
+      
+    } else {
+      // If the user is removing their vote (downvoting), remove their userId from the array
+      if (userHasVoted) {
+        film.votes = film.votes.filter((vote) => vote !== userId);
+
+        // Remove the notification related to this vote (if it exists)
+        const notification = await Notification.findOne({
+          type: 'Vote',
+          user: film.uploadedBy._id, // The film owner
+          initiator: userId, // The user who voted
+          film: filmId, // The film ID
+        });
+
+        if (notification) {
+          await Notification.deleteOne({ _id: notification._id }); // Delete the notification if found
+        }
+      }
+    }
+
+    // Save the updated film
+    await film.save();
+
+    // Respond with the updated votes count and whether the user has voted
+    res.json({
+      votes: film.votes.length, // The number of votes is the length of the array
+      userHasVoted: film.votes.includes(userId), // Check if user has voted
+    });
+  } catch (err) {
+    console.error('Error voting on film:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+
+exports.getVotes = async (req, res) => {
+  try {
+    const { filmId } = req.params;
+    const userId = req.user; // Assuming `authMiddleware` attaches the user info to req.user
+    
+    // Fetch film details, ensure votes is initialized to an empty array
+    const film = await Film.findById(filmId);
+    if (!film) {
+      return res.status(404).json({ message: 'Film not found' });
+    }
+
+    // Ensure votes field is initialized to an empty array if not present
+    if (!film.votes) {
+      film.votes = [];
+    }
+
+    // Check if the user has voted
+    const userHasVoted = film.votes.includes(userId); // Adjust based on how you store votes
+
+    // Respond with votes count and user's vote status
+    res.json({
+      votes: film.votes.length, // Number of votes
+      userHasVoted, // Boolean: whether the user has already upvoted
+    });
+  } catch (err) {
+    console.error('Error fetching votes:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.getFeed = async (req, res) => {
+  try {
+    const userId = req.user; // Assumes `authenticate` middleware attaches `user` to req
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    // Fetch the current user and populate the 'following' field (assumes `following` is an array of ObjectIds)
+    const currentUser = await User.findById(userId)
+      .populate('following', 'username email _id') // Populate the `following` field with username, email, and _id
+      .exec();
+
+    if (!currentUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Get the list of followed users' IDs, including the current user's ID
+    const userIdsToFetch = [
+      ...currentUser.following.map((user) => user._id), // IDs of users the current user is following
+      userId // Include the current user's own ID for their films
+    ];
+    // Fetch public and unlisted films from the followed users and the current user
+    const films = await Film.find({
+      uploadedBy: { $in: userIdsToFetch }, // Match films uploaded by followed users or the current user
+      visibility: { $in: ['public', 'unlisted', 'private'] }, // Optionally filter by visibility
+    })
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .populate('uploadedBy', 'username _id') // Populate `uploadedBy` field with username and email
+      .lean(); // Use lean to return plain JavaScript objects (faster)
+
+    res.status(200).json(films);
+  } catch (err) {
+    console.error('Error fetching feed films:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+

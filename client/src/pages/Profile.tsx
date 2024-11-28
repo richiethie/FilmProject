@@ -1,63 +1,31 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Footer from '../components/Footer';
 import LeftFeedNav from '../components/LeftFeedNav';
 import axios from 'axios';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { FaPlay } from "react-icons/fa";
+import { MdDoNotDisturb } from "react-icons/md";
 import { useAuth } from '../context/AuthContext';
 import EditProfileModal from '../components/EditProfileModal';
 import stockProfilePic from "../assets/img/profilePic/stock-profile-pic.webp";
 import ProfileFilmModal from '../components/ProfileFilmModal';
+import { User } from '../types/User';
+import { Film } from '../types/Film';
+import FollowButton from '../components/FollowButton';
 
-interface Film {
-  title: string;
-  description?: string;
-  thumbnailUrl: string;
-  filmUrl: string;
-  genre?: string;
-  series?: string;
-  duration?: number;
-  rank: number | null;
-  visibility: 'private' | 'unlisted' | 'public';
-  votes: number;
-  uploadedBy: { username: string; email: string; _id: string };
-  createdAt: Date;
-}
-
-interface User {
-  username: string;
-  email: string;
-  profilePhotoUrl?: string;
-  bio?: string;
-  followersCount: number;
-  followingCount: number;
-  followers: string[];
-  following: string[];
-  role: 'user' | 'admin' | 'moderator';
-  status: 'active' | 'suspended' | 'deleted';
-  lastLogin?: Date;
-  socialLinks?: {
-    twitter?: string;
-    instagram?: string;
-    linkedin?: string;
-  };
-  preferences?: {
-    darkMode: boolean;
-    notifications: boolean;
-  };
-  uploadedFilmsCount: number;
-  createdAt: Date;
-}
 
 const Profile = () => {
   const [films, setFilms] = useState<Film[] | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [noFilms, setNoFilms] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState<Partial<User>>({});
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
-  const { userId, isAuthenticated, token } = useAuth();
+  const { token, loggedInUserId } = useAuth();
+  const { userId } = useParams();
 
   useEffect(() => {
     if (!userId) {
@@ -84,8 +52,20 @@ const Profile = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFilms(filmsResponse.data);
+        setNoFilms(filmsResponse.data.length === 0);
       } catch (err) {
-        setError('Error fetching films');
+        if (axios.isAxiosError(err)) {
+          // Narrow the type to AxiosError
+          if (err.response?.status === 404) {
+            setFilms([]);
+            setNoFilms(true);
+          } else {
+            setError('Error fetching films');
+          }
+        } else {
+          // Handle non-Axios errors
+          setError('An unexpected error occurred');
+        }
         console.error(err);
       } finally {
         setLoading(false);
@@ -162,13 +142,18 @@ const Profile = () => {
               </div>
             </div>
           </div>
-          <button
-            onClick={() => setEditModalOpen(true)}
-            className="bg-cornflowerBlue text-white px-4 py-2 rounded-lg"
-          >
-            Edit Profile
-          </button>
+          {loggedInUserId === userId ? (
+            <button
+              onClick={() => setEditModalOpen(true)}
+              className="bg-cornflowerBlue text-white px-4 py-2 rounded-lg h-10 min-w-max whitespace-nowrap"
+            >
+              Edit Profile
+            </button>
+          ) : (
+            <FollowButton targetUserId={userId || ''} token={token || ''}/>
+          )}
         </section>
+
 
         {/* Edit Modal */}
         {isEditModalOpen && (
@@ -189,56 +174,54 @@ const Profile = () => {
             <p>Loading films...</p>
           ) : error ? (
             <p>{error}</p>
+          ) : noFilms ? (
+            <div className='flex flex-col items-center justify-center mt-16'>
+              <MdDoNotDisturb className='text-5xl text-steelGray mb-4'/>
+              <p className='text-steelGray font-bold'>No films available</p>
+            </div>
           ) : (
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.isArray(films) && films.length > 0 ? (
-                films.map((film, index) => (
-                  <div
-                    key={index}
-                    className="bg-charcoal rounded-lg overflow-hidden relative group" // Add `group` class here
-                    onClick={() => openFilmModal(film)}
-                  >
-                    <div className="relative w-full pb-[56.25%] cursor-pointer">
-                      <img
-                        src={film.thumbnailUrl}
-                        alt={film.title}
-                        className={`${
-                          film.rank && 'border-4 border-cornflowerBlue'
-                        } absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg`}
-                      />
-                      {film.rank && (
-                        <div className="absolute top-3 left-4 text-cornflowerBlue">
-                          <IoMdTrendingUp className="text-3xl" />
-                        </div>
-                      )}
-                      {/* Dark background effect */}
-                      <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      {/* Play button */}
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              {films?.map((film, index) => (
+                <div
+                  key={index}
+                  className="bg-charcoal rounded-lg overflow-hidden relative group"
+                  onClick={() => openFilmModal(film)}
+                >
+                  <div className="relative w-full pb-[56.25%] cursor-pointer">
+                    <img
+                      src={film.thumbnailUrl}
+                      alt={film.title}
+                      className={`${
+                        film.rank && 'border-4 border-cornflowerBlue'
+                      } absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg`}
+                    />
+                    {film.rank && (
+                      <div className="absolute top-3 left-4 text-cornflowerBlue">
+                        <IoMdTrendingUp className="text-3xl" />
+                      </div>
+                    )}
+                    <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <FaPlay className="text-4xl text-white" />
-                      </div>
-                    </div>
-                    <div className="p-4 flex justify-between items-center">
-                      <div>
-                        <h3 className="text-xl font-bold">{film.title}</h3>
-                        <p className="text-sm text-gray-400">by {film.uploadedBy?.username}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">{film.votes} votes</p>
-                        {film.rank ? <p>RANK #{film.rank}</p> : <p>-</p>}
-                      </div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <p>No films available</p>
-              )}
+                  <div className="p-4 flex justify-between items-center">
+                    <div>
+                      <h3 className="text-xl font-bold">{film.title}</h3>
+                      <p className="text-sm text-gray-400">by {film.uploadedBy?.username}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-400">{film.votes.length} votes</p>
+                      {film.rank ? <p>RANK #{film.rank}</p> : <p>-</p>}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </section>
       </main>
 
-      {/* Film Modal */}
       <ProfileFilmModal 
         selectedFilm={selectedFilm}
         closeFilmModal={closeFilmModal}

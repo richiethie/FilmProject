@@ -1,31 +1,19 @@
 import { IoClose } from "react-icons/io5";
+import { Film } from "../types/Film";
 
-interface Film {
-    title: string;
-    description: string;
-    thumbnailUrl: string;
-    filmUrl: string;
-    genre: string;
-    series: string;
-    duration: number;
-    rank: number | null;
-    votes: number;
-    visibility: "private" | "unlisted" | "public";
-    uploadedBy: string;
-  }
   
-  interface UploadFilmListItemVideoProps {
-    selectedFilm: Film;
-    isModalOpen: boolean;
-    closeModal: () => void;
-  }
+interface UploadFilmListItemVideoProps {
+  selectedFilm: Film;
+  isModalOpen: boolean;
+  closeModal: () => void;
+}
   
-  const UploadFilmListItemVideo = ({
-    selectedFilm,
-    isModalOpen,
-    closeModal,
-  }: UploadFilmListItemVideoProps) => {
-    if (!isModalOpen) return null;
+const UploadFilmListItemVideo = ({
+  selectedFilm,
+  isModalOpen,
+  closeModal,
+}: UploadFilmListItemVideoProps) => {
+  if (!isModalOpen) return null;
   
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-30">

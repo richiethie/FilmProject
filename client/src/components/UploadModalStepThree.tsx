@@ -21,7 +21,7 @@ const UploadModalStepThree = (props: UploadModalStepThreeProps) => {
         thumbnailUrl,
         handleVisibilityChange,
         handlePrevious,
-        handleSubmit
+        handleSubmit,
     } = props;
 
 

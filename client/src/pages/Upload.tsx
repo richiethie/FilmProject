@@ -9,20 +9,7 @@ import UploadFilmList from '../components/UploadFilmList';
 import ProgressBar from '../components/ProgressBar';
 import axios from 'axios'; // Make sure to import axios for API calls
 import { useAuth } from '../context/AuthContext';
-
-interface Film {
-    title: string;
-    description: string;
-    thumbnailUrl: string;
-    filmUrl: string; // URL or path to the film file
-    genre: string;
-    series: string;
-    duration: number; // Duration in minutes
-    rank: number | null;
-    votes: number;
-    visibility: 'private' | 'unlisted' | 'public';
-    uploadedBy: string; // Assuming you handle user authentication and pass the user ID
-}
+import { Film } from '../types/Film';
 
 const Upload = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,8 +25,9 @@ const Upload = () => {
     const [visibility, setVisibility] = useState<'private' | 'unlisted' | 'public'>('private'); // State for visibility
     const [duration, setDuration] = useState(0); // Duration in minutes
     const [rank, setRank] = useState<number | null>(null); // Rank for the film
-    const [votes, setVotes] = useState(0); // Default votes count
+    const [votes, setVotes] = useState<string[]>([]); // Default votes count
     const [filmUrl, setFilmUrl] = useState<string>("");
+    const [filmUploaded, setFilmUploaded] = useState(false);
 
     const [films, setFilms] = useState<Film[]>([]); // New state to store the list of uploaded films
 
@@ -128,7 +116,7 @@ const Upload = () => {
             votes,
             filmUrl,
             thumbnailUrl: thumbnailUrl || '', // Send empty string if no thumbnail URL
-            uploadedBy: userId || '', // Replace with actual user ID
+            uploadedBy: { _id: userId || ''}, // Replace with actual user ID
         };
     
         console.log("Film data being sent:", filmData);
@@ -149,6 +137,7 @@ const Upload = () => {
     
             // Update the films list after submission
             const newFilm: Film = {
+                _id: response.data._id, // Assume the backend returns a unique film ID
                 title,
                 description,
                 thumbnailUrl: thumbnailUrl || '',
@@ -157,11 +146,18 @@ const Upload = () => {
                 series,
                 duration,
                 rank,
-                votes,
+                votes: [], // Initialize with an empty array
                 visibility,
-                uploadedBy: userId || '',
+                uploadedBy: {
+                    _id: userId || '', 
+                    username: response.data.username || '', 
+                    email: response.data.email || '',
+                },
+                createdAt: new Date(),
+                comments: [], // Initialize comments as empty
             };
             setFilms([...films, newFilm]);
+            setFilmUploaded(true);
     
             closeModal(); // Close modal after submission
         } catch (error) {
@@ -186,6 +182,8 @@ const Upload = () => {
                 {/* Render the list of films */}
                 <UploadFilmList 
                     handleSubmit={handleSubmit}
+                    filmUploaded={filmUploaded}
+                    setFilmUploaded={setFilmUploaded}
                 />
 
                 {/* Upload Modal */}

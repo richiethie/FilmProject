@@ -9,7 +9,7 @@ import { CgProfile } from "react-icons/cg";
 import { FaUpload } from "react-icons/fa6";
 
 const LeftFeedNav = () => {
-    const { logout } = useAuth();
+    const { logout, userId } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -38,7 +38,7 @@ const LeftFeedNav = () => {
                         <FaUpload className='text-3xl'/>
                         <li  className='text-xl font-semibold ml-4'>Upload</li>
                     </Link>
-                    <Link to="/profile" className="flex justify-center items-center hover:text-cornflowerBlue py-2">
+                    <Link to={`/profile/${userId}`} className="flex justify-center items-center hover:text-cornflowerBlue py-2">
                         <CgProfile className='text-3xl'/>
                         <li  className='text-xl font-semibold ml-4'>Profile</li>
                     </Link>

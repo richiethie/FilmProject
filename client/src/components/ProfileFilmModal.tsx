@@ -1,19 +1,5 @@
 import { IoMdClose } from 'react-icons/io';
-
-interface Film {
-    title: string;
-    description?: string;
-    thumbnailUrl: string;
-    filmUrl: string;
-    genre?: string;
-    series?: string;
-    duration?: number;
-    rank: number | null;
-    visibility: 'private' | 'unlisted' | 'public';
-    votes: number;
-    uploadedBy: { username: string; email: string; _id: string };
-    createdAt: Date;
-}
+import { Film } from '../types/Film';
 
 interface ProfileFilmModalProps {
   selectedFilm: Film | null;
@@ -46,7 +32,7 @@ const ProfileFilmModal= (props: ProfileFilmModalProps) => {
                 <p className="mt-4">{selectedFilm.description || 'No description available'}</p>
                 <div className="mt-4">
                     <p>
-                        <strong>Votes: </strong>{selectedFilm.votes}
+                        <strong>Votes: </strong>{selectedFilm.votes.length}
                     </p>
                     <p>
                         <strong>Rank: </strong>{selectedFilm.rank || 'N/A'}

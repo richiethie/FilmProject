@@ -67,11 +67,21 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('passwordHash')) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
+  if (this.isModified('passwordHash') || this.isNew) {
+    // Ensure 'password' field (plain text password) is being hashed
+    if (this.password) {
+      const salt = await bcrypt.genSalt(10);
+      this.passwordHash = await bcrypt.hash(this.password, salt); // Hash the plain password
+      this.password = undefined; // Don't save the plain password, just the hashed password
+    }
+  }
   next();
 });
+
+
+
+
+
 
 module.exports = mongoose.model('User', userSchema);
 

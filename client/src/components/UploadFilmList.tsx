@@ -5,29 +5,17 @@ import { FaEllipsisV, FaPlay } from "react-icons/fa";
 import { MdDeleteOutline, MdEdit } from "react-icons/md";
 import { FaCalendarAlt } from "react-icons/fa";
 import UploadFilmListItemVideo from "./UploadFilmListItemVideo";
-
-interface Film {
-    _id: string;
-    title: string;
-    description: string;
-    thumbnailUrl: string;
-    filmUrl: string; // URL or path to the film file
-    genre: string;
-    series: string;
-    duration: number; // Duration in minutes
-    rank: number | null;
-    votes: number;
-    visibility: "private" | "unlisted" | "public";
-    uploadedBy: string;
-}
+import { Film } from "../types/Film";
 
 interface UploadFilmListProps {
     handleSubmit: (e: React.FormEvent) => void; // Function to handle final submission
+    filmUploaded: boolean;
+    setFilmUploaded: (filmUploaded: boolean) => void;
 }
 
 const UploadFilmList = (props: UploadFilmListProps) => {
 
-    const {handleSubmit} = props
+    const {handleSubmit, filmUploaded, setFilmUploaded} = props
 
     const [films, setFilms] = useState<Film[]>([]);
     const [loading, setLoading] = useState(true);
@@ -59,7 +47,10 @@ const UploadFilmList = (props: UploadFilmListProps) => {
         };
 
         fetchFilms();
-    }, [userId, handleSubmit]);
+        if (filmUploaded) {
+            setFilmUploaded(false);
+        }
+    }, [userId, filmUploaded]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

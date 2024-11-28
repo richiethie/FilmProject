@@ -9,12 +9,13 @@ const filmSchema = new mongoose.Schema({
   series: { type: String },
   duration: { type: Number }, // Duration in minutes
   rank: { type: Number, default: null },
-  votes: { type: Number, default: 0 },
+  votes: { type: [String], default: [] },
   visibility: {
     type: String,
     enum: ['private', 'unlisted', 'public'],
     default: 'private',
   },
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
   uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
 });

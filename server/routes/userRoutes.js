@@ -5,6 +5,7 @@ const { uploadProfilePictureToS3, updateUserProfile } = require('../controllers/
 const upload = require('../middleware/uploadMiddleware');
 const auth = require('../middleware/authMiddleware');
 const Follow = require('../models/Follow');
+const { createNotification } = require('../utils/notifications');
 
 // Route to get a list of all users
 router.get('/', auth, async (req, res) => {
@@ -61,8 +62,10 @@ router.post('/:userId/follow', auth, async (req, res) => {
     // Add currentUserId to the followed user's followers list
     await User.findByIdAndUpdate(userToFollowId, {
       $addToSet: { followers: currentUserId },
-      $inc: { followerCount: 1 }
+      $inc: { followersCount: 1 }
     });
+
+    await createNotification('Follow', userToFollowId, currentUserId);
 
     res.status(200).send('Followed successfully');
   } catch (err) {
@@ -84,7 +87,7 @@ router.post('/:userId/unfollow', auth, async (req, res) => {
     // Remove currentUserId from the followed user's followers list
     await User.findByIdAndUpdate(userToUnfollowId, {
       $pull: { followers: currentUserId },
-      $inc: { followerCount: -1 }
+      $inc: { followersCount: -1 }
     });
 
     res.status(200).send('Unfollowed successfully');

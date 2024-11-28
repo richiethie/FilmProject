@@ -5,6 +5,8 @@ const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/auth');
 const filmRoutes = require('./routes/film');
+const notificationRoutes = require('./routes/notificationRoutes');
+const commentRoutes = require('./routes/commentRoutes')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,6 +29,8 @@ app.use(express.json({ limit: '50mb' })); // Parse incoming JSON requests
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/films', filmRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Start the server
 app.listen(PORT, () => {

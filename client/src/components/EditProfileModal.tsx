@@ -1,31 +1,8 @@
 import { useState } from "react";
 import { useAuth } from '../context/AuthContext';
 import stockProfilePic from "../assets/img/profilePic/stock-profile-pic.webp"
+import { User } from "../types/User";
 
-interface User {
-  username: string;
-  email: string;
-  profilePhotoUrl?: string;
-  bio?: string;
-  followersCount: number;
-  followingCount: number;
-  followers: string[];
-  following: string[];
-  role: 'user' | 'admin' | 'moderator';
-  status: 'active' | 'suspended' | 'deleted';
-  lastLogin?: Date;
-  socialLinks?: {
-    twitter?: string;
-    instagram?: string;
-    linkedin?: string;
-  };
-  preferences?: {
-    darkMode: boolean;
-    notifications: boolean;
-  };
-  uploadedFilmsCount: number;
-  createdAt: Date;
-}
 
 interface EditProfileModalProps {
   user: User | null;
