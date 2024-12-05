@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaSearch, FaRegComment, FaPlay } from 'react-icons/fa';
+import { FaSearch, FaPlay } from 'react-icons/fa';
 import { FiSend } from "react-icons/fi";
 import Footer from '../components/Footer';
 import CategoryPills from '../components/CategoryPills';
@@ -14,6 +14,7 @@ import { categories } from '../data/home';
 import { Film } from '../types/Film';
 import { User } from '../types/User';
 import Comment from '../components/Comment';
+import TopTenFilms from '../components/TopTenFilms';
 
 const Explore = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -122,6 +123,8 @@ const Explore = () => {
                     </div>
                 )}
 
+                <TopTenFilms />
+
                 {/* Content Section */}
                 <section className="mb-12 mt-8">
                     {loading ? (
@@ -148,7 +151,7 @@ const Explore = () => {
                                             <div className="flex justify-between items-center">
                                                 <div>
                                                     <h3 className="text-xl font-bold">{film.title}</h3>
-                                                    <p className="text-sm text-gray-400">by {film.uploadedBy?.username}</p>
+                                                    <p className="text-sm text-gray-400">by <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} /></p>
                                                 </div>
                                                 <div className="flex space-x-4 items-center">
                                                     <Vote filmId={film._id} />

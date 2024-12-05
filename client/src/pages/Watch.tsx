@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import ProfileLink from '../components/ProfileLink';
 import { Film } from '../types/Film';
 import { Comment } from '../types/Comment';
+import { formatDistanceToNow, format } from 'date-fns';
 
 const Watch = () => {
     const { id } = useParams(); // Get the film ID from the route
@@ -111,14 +112,8 @@ const Watch = () => {
         <div className="min-h-screen bg-charcoal text-crispWhite p-8 flex justify-center">
             {/* Film Details Section */}
             <div className="flex-grow max-w-4xl">
-                <h1 className="text-4xl font-bold mb-4">{film.title}</h1>
-                <p className="text-sm text-gray-400 mb-6">
-                    Uploaded by <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id}/> on{' '}
-                    {new Date(film.createdAt).toLocaleDateString()}
-                </p>
-
                 {/* Film Player */}
-                <div className="relative aspect-w-16 aspect-h-9 mb-8">
+                <div className="relative aspect-w-16 aspect-h-9 mb-2">
                     <video
                         src={film.filmUrl}
                         controls
@@ -126,10 +121,20 @@ const Watch = () => {
                     ></video>
                 </div>
 
+                <div>
+                    <div>
+                        <h1 className="text-2xl font-bold">{film.title}</h1>
+                        <p className="text-sm text-gray-400 mb-6">
+                            by <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id}/> {formatDistanceToNow(new Date(film.createdAt), { addSuffix: true })}
+                        </p>
+                    </div>
+                </div>
+
                 {/* Film Details */}
                 <div className="bg-charcoal border border-steelGray rounded-lg p-6 shadow-inner shadow-secondary">
                     <h2 className="text-2xl font-bold mb-4">Description</h2>
                     <p className="text-lg">{film.description || 'No description provided.'}</p>
+                    <p className='text-md text-steelGray'>Uploaded on {format(new Date(film.createdAt), 'MMMM d, yyyy')}</p>
 
                     <h3 className="text-xl font-semibold mt-6 mb-2">Genre</h3>
                     <p className="text-lg">{film.genre || 'Not specified.'}</p>
@@ -163,9 +168,12 @@ const Watch = () => {
                         {comments.length > 0 ? (
                             comments.map((comment) => (
                                 <div key={comment._id} className="bg-charcoal p-4 border border-steelGray rounded-lg shadow-inner">
-                                    <p className="text-sm text-gray-400" onClick={() => console.log(comment.createdAt)}>{new Date(comment.createdAt).toLocaleString()}</p>
-                                    <p className="text-lg">{comment.text}</p>
-                                    <p className="text-sm text-crispWhite font-semibold mt-2">- <ProfileLink username={comment.user.username} userId={comment.user._id}/></p>
+                                    <div className='flex items-center'>
+                                        <p className="text-sm text-crispWhite font-semibold mr-2"><ProfileLink username={comment.user.username} userId={comment.user._id}/></p>
+                                        <p className="text-sm text-gray-400" onClick={() => console.log(comment.createdAt)}>{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}</p>
+                                    </div>
+                                    <p className="text-lg mt-2">{comment.text}</p>
+                                    
                                 </div>
                             ))
                         ) : (

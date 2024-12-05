@@ -126,8 +126,6 @@ exports.getUserFilms = async (req, res) => {
 
     const films = await Film.find({ uploadedBy: new mongoose.Types.ObjectId(userId) }).populate('uploadedBy', 'username');
 
-    console.log('Films found:', films);
-
     if (films.length === 0) {
       return res.status(404).json({ message: 'No films found for this user.' });
     }
@@ -313,4 +311,32 @@ exports.getFeed = async (req, res) => {
   }
 };
 
+exports.getTopTenFilms = async (req, res) => {
+  try {
+    const topFilms = await Film.aggregate([
+      // Match only public films
+      //{ $match: { visibility: 'public' } },
+      // Add a field to calculate the number of votes
+      {
+        $addFields: {
+          voteCount: { $size: "$votes" },
+        },
+      },
+      // Sort by the number of votes in descending order
+      { $sort: { voteCount: -1 } },
+      // Limit to top 10 films
+      { $limit: 10 },
+    ]);
 
+    // Populate the `uploadedBy` field for additional user details
+    const populatedTopFilms = await Film.populate(topFilms, {
+      path: 'uploadedBy',
+      select: 'username', // Only include the `username` field from the User document
+    });
+
+    res.json(populatedTopFilms);
+  } catch (error) {
+    console.error("Error fetching top films:", error);
+    res.status(500).json({ error: 'Failed to fetch top films' });
+  }
+};

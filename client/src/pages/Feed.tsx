@@ -8,10 +8,10 @@ import { useAuth } from '../context/AuthContext';
 import { Film } from '../types/Film';
 import { FaPlay } from 'react-icons/fa';
 import { FiSend } from 'react-icons/fi';
-import { FaRegComment } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom'; // Assuming you use react-router for navigation
 import Vote from '../components/Vote';
 import ProfileLink from '../components/ProfileLink';
+import Comment from '../components/Comment';
 
 const Feed = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -25,7 +25,6 @@ const Feed = () => {
     useEffect(() => {
         const fetchFeedFilms = async () => {
             try {
-                console.log("Sending token:", token); // Debugging log
                 const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/films/feed`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
@@ -96,12 +95,7 @@ const Feed = () => {
                                             </div>
                                             <div className="flex space-x-4 items-center">
                                                 <Vote filmId={film._id} />
-                                                <button
-                                                    className="text-crispWhite hover:text-cornflowerBlue"
-                                                    onClick={() => navigate(`/films/${film._id}`)}
-                                                >
-                                                    <FaRegComment className="text-2xl" />
-                                                </button>
+                                                <Comment filmId={film._id}/>
                                                 <button className="text-crispWhite hover:text-cornflowerBlue">
                                                     <FiSend className="text-2xl" />
                                                 </button>
