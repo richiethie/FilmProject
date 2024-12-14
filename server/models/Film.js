@@ -6,7 +6,7 @@ const filmSchema = new mongoose.Schema({
   thumbnailUrl: { type: String, required: true },
   filmUrl: { type: String, required: true }, // URL or path to the film file
   genre: { type: String },
-  series: { type: String },
+  series: { type: mongoose.Schema.Types.ObjectId, ref: 'Series' },
   duration: { type: Number }, // Duration in minutes
   rank: { type: Number, default: null },
   votes: { type: [String], default: [] },

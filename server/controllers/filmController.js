@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const Film = require('../models/Film');
-const User = require('../models/User')
+const User = require('../models/User');
+const Series = require('../models/Series')
 const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
 const { createNotification } = require('../utils/notifications');
@@ -18,11 +19,46 @@ exports.uploadFilm = async (req, res) => {
   try {
     console.log("req.body:", req.body); // Check the metadata fields
 
-    const { title, description, genre, series, filmUrl, thumbnailUrl, visibility, duration, rank, votes, uploadedBy } = req.body;
+    const {
+      title,
+      description,
+      genre,
+      series, // Series title
+      filmUrl,
+      thumbnailUrl,
+      visibility,
+      duration,
+      rank,
+      votes,
+      uploadedBy,
+    } = req.body;
+
+    console.log("SERIES: ", series)
 
     // Validate required fields
     if (!title || !filmUrl || !uploadedBy) {
       return res.status(400).json({ message: 'Missing required fields: title, filmUrl, or uploadedBy.' });
+    }
+
+    let seriesId = null;
+
+    // Handle series creation or linking
+    if (series) {
+      let existingSeries = await Series.findOne({ title: series.title });
+
+      if (!existingSeries) {
+        // Create a new series if it doesn't exist
+        const newSeries = new Series({
+          title: series.title,
+          createdBy: uploadedBy,
+          films: [], // Initialize with an empty array
+        });
+
+        existingSeries = await newSeries.save();
+      }
+
+      // Assign the series ID
+      seriesId = existingSeries._id;
     }
 
     // Create a new film entry
@@ -30,18 +66,25 @@ exports.uploadFilm = async (req, res) => {
       title,
       description,
       genre,
-      series,
-      filmUrl,               // S3 URL of the uploaded film
-      thumbnailUrl,          // Thumbnail URL
-      visibility,            // Visibility setting
-      duration,              // Duration in minutes
-      rank: rank || 0,                  // Rank, if provided
-      votes,                 // Votes, if provided
-      uploadedBy,            // User who uploaded the film
+      series: seriesId, // Link the series ID
+      filmUrl,          // S3 URL of the uploaded film
+      thumbnailUrl,     // Thumbnail URL
+      visibility,       // Visibility setting
+      duration,         // Duration in minutes
+      rank: rank || 0,  // Rank, if provided
+      votes,            // Votes, if provided
+      uploadedBy,       // User who uploaded the film
     });
 
     // Save the film entry to the database
     await newFilm.save();
+
+    // If a series was linked or created, update its films array
+    if (seriesId) {
+      await Series.findByIdAndUpdate(seriesId, {
+        $push: { films: newFilm._id }, // Add the film to the series
+      });
+    }
 
     // Return the newly created film
     res.status(201).json({
@@ -124,7 +167,9 @@ exports.getUserFilms = async (req, res) => {
       return res.status(400).json({ message: 'Invalid user ID format' });
     }
 
-    const films = await Film.find({ uploadedBy: new mongoose.Types.ObjectId(userId) }).populate('uploadedBy', 'username');
+    const films = await Film.find({ uploadedBy: new mongoose.Types.ObjectId(userId) })
+      .populate('uploadedBy', 'username')
+      .populate('series', 'title');
 
     if (films.length === 0) {
       return res.status(404).json({ message: 'No films found for this user.' });
@@ -338,5 +383,27 @@ exports.getTopTenFilms = async (req, res) => {
   } catch (error) {
     console.error("Error fetching top films:", error);
     res.status(500).json({ error: 'Failed to fetch top films' });
+  }
+};
+
+exports.getFilmsByGenre = async (req, res) => {
+  try {
+    const { genre } = req.params;
+    console.log("Genre received in params:", genre);
+
+    if (!genre || typeof genre !== 'string') {
+      return res.status(400).json({ message: 'Invalid or missing genre parameter' });
+    }
+
+    const films = await Film.find({ genre }).populate('uploadedBy', 'username');
+
+    if (films.length === 0) {
+      return res.status(404).json({ message: `No films found for genre: ${genre}` });
+    }
+
+    res.status(200).json(films);
+  } catch (err) {
+    console.error('Error fetching films by genre:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };

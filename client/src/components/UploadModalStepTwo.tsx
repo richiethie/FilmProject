@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { genres } from '../data/home';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { Series } from '@/types/Series';
 
 interface UploadModalStepTwoProps {
   title: string;
   description: string;
   thumbnail: File | null;
   thumbnailUrl: string | null;
-  series: string;
+  series: Series | null;
+  seriesList: Series[] | null;
   isCreatingNewSeries: boolean;
   genre: string;
   setGenre: (genre: string) => void;
@@ -29,6 +31,7 @@ const UploadModalStepTwo = (props: UploadModalStepTwoProps) => {
     thumbnail,
     thumbnailUrl,
     series,
+    seriesList,
     isCreatingNewSeries,
     genre,
     setGenre,
@@ -42,7 +45,7 @@ const UploadModalStepTwo = (props: UploadModalStepTwoProps) => {
     handleNext,
   } = props;
 
-  const [seriesOptions] = useState(['Series 1', 'Series 2', 'Series 3']); // Example series options
+  const [seriesOptions] = useState(seriesList); // Example series options
 
   const { token } = useAuth();
 
@@ -151,16 +154,16 @@ const UploadModalStepTwo = (props: UploadModalStepTwoProps) => {
           </label>
           <select
             id="series"
-            value={series}
+            value={series?.title}
             onChange={handleSeriesChange}
             className="w-full bg-charcoal py-2 px-4 rounded-md outline-none"
           >
             <option value="" disabled>
               Select a series
             </option>
-            {seriesOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
+            {seriesOptions?.map((series) => (
+              <option key={series._id} value={series.title}>
+                {series.title}
               </option>
             ))}
             <option value="new">Create a new series</option>
@@ -169,7 +172,7 @@ const UploadModalStepTwo = (props: UploadModalStepTwoProps) => {
           {isCreatingNewSeries && (
             <input
               type="text"
-              value={series}
+              value={series?.title}
               onChange={handleNewSeriesChange}
               className="w-full mt-2 bg-charcoal shadow-inner py-2 px-4 rounded-md outline-none placeholder-gray-600"
               placeholder="Enter new series name"

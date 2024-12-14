@@ -6,6 +6,7 @@
   ],
   "compilerOptions": {
     "types": ["node"],
+    "jsx": "react-jsx"
     // other options
   }
 }

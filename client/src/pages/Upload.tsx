@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
-import LeftFeedNav from '../components/LeftFeedNav';
 import { IoCloseOutline } from "react-icons/io5";
 import UploadModalStepOne from '../components/UploadModalStepOne';
 import UploadModalStepTwo from '../components/UploadModalStepTwo';
@@ -10,6 +9,8 @@ import ProgressBar from '../components/ProgressBar';
 import axios from 'axios'; // Make sure to import axios for API calls
 import { useAuth } from '../context/AuthContext';
 import { Film } from '../types/Film';
+import { Series } from '../types/Series';
+import FeedHeader from '@/components/FeedHeader';
 
 const Upload = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,7 +20,8 @@ const Upload = () => {
     const [description, setDescription] = useState('');
     const [thumbnail, setThumbnail] = useState<File | null>(null);
     const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null); // State for thumbnail URL
-    const [series, setSeries] = useState(''); // State for the selected series
+    const [series, setSeries] = useState<Series | null>(null);
+    const [seriesList, setSeriesList] = useState<Series[] | null>([]); // State for the selected series
     const [isCreatingNewSeries, setIsCreatingNewSeries] = useState(false); // State to toggle new series input
     const [genre, setGenre] = useState('');
     const [visibility, setVisibility] = useState<'private' | 'unlisted' | 'public'>('private'); // State for visibility
@@ -31,20 +33,70 @@ const Upload = () => {
 
     const [films, setFilms] = useState<Film[]>([]); // New state to store the list of uploaded films
 
-    const { userId, token } = useAuth();
+    const { userId, username, token } = useAuth();
+
+    useEffect(() => {
+
+        const fetchUserSeries = async () => {
+            console.log("TESTING")
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/series/user/${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
+        
+                console.log('User series:', response.data);
+                setSeriesList(response.data);
+            } catch (err) {
+                if (axios.isAxiosError(err)) {
+                    // Handle Axios specific error (optional, if you're using Axios)
+                    console.error('Error fetching user series:', err.response?.data?.message || 'Server error');
+                } else {
+                    // Handle general unknown error
+                    console.error('Unknown error fetching user series:', err);
+                }
+            }
+        };
+
+        fetchUserSeries();
+        if (filmUploaded) {
+            setFilmUploaded(false);
+        }
+    }, [userId]);
 
     const handleSeriesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const value = e.target.value;
         if (value === 'new') {
             setIsCreatingNewSeries(true);
+            setSeries(null);
         } else {
             setIsCreatingNewSeries(false);
-            setSeries(value);
+            const selectedSeries = seriesList?.find((series) => series._id === value); // Find the selected series object
+            setSeries(selectedSeries || null);
         }
     };
 
     const handleNewSeriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSeries(e.target.value);
+        const value = e.target.value.trim(); // Remove any extra whitespace
+        const existingSeries = seriesList?.find(series => series.title === value);
+        
+        if (existingSeries) {
+            setSeries(existingSeries); // If found, set the existing series
+        } else {
+            // If not found, create a new series object
+            setSeries({
+                _id: '', // Placeholder for _id (empty string initially)
+                title: value, // Title from input
+                createdBy: { 
+                    _id: '', 
+                    username: '', 
+                    email: '' // Optional email, replace if necessary
+                }, 
+                films: [], // Empty films array
+                createdAt: new Date(), // Set current date as createdAt
+            });
+        }
     };
 
     const openModal = () => setIsModalOpen(true);
@@ -143,7 +195,9 @@ const Upload = () => {
                 thumbnailUrl: thumbnailUrl || '',
                 filmUrl,
                 genre,
-                series,
+                series: series
+                ? { _id: series._id, title: series.title } // Ensure series matches the expected type
+                : undefined, // Explicitly set to undefined if null
                 duration,
                 rank,
                 votes: [], // Initialize with an empty array
@@ -167,7 +221,7 @@ const Upload = () => {
 
     return (
         <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
-            <LeftFeedNav />
+            <FeedHeader />
             <main className="flex-grow container max-w-[60%] mx-auto px-4 py-8">
                 <div className='flex justify-between items-center'>
                     <h2 className='text-xl font-semibold'>Creator <span className='text-cornflowerBlue'>Studio</span></h2>
@@ -224,6 +278,7 @@ const Upload = () => {
                                         thumbnail={thumbnail}
                                         thumbnailUrl={thumbnailUrl}
                                         series={series}
+                                        seriesList={seriesList}
                                         isCreatingNewSeries={isCreatingNewSeries}
                                         genre={genre}
                                         setGenre={setGenre}
@@ -248,6 +303,7 @@ const Upload = () => {
                                         genre={genre}
                                         isCreatingNewSeries={isCreatingNewSeries}
                                         series={series}
+                                        seriesList={seriesList}
                                         thumbnail={thumbnail}
                                     />
                                 )}

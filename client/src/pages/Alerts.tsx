@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Footer from '../components/Footer';
-import LeftFeedNav from '../components/LeftFeedNav';
 import { Notification } from '../types/Notification';
 import { useAuth } from '../context/AuthContext';
 import FollowButton from '../components/FollowButton';
 import ProfileLink from '../components/ProfileLink';
 import { useNavigate } from "react-router-dom";
+import FeedHeader from '@/components/FeedHeader';
 
 const Alerts = () => {
     const [alerts, setAlerts] = useState<Notification[]>([]); // Type defined using Notification interface
@@ -33,9 +33,9 @@ const Alerts = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-charcoal text-crispWhite py-8">
-            <LeftFeedNav />
-            <h1 className="text-4xl font-bold text-center mb-8">Alerts</h1>
+        <div className="min-h-screen bg-charcoal text-crispWhite">
+            <FeedHeader />
+            <h1 className="text-4xl font-bold text-center my-8">Alerts</h1>
             <div className="container mx-auto px-4">
                 {loading ? (
                     <p className="text-center">Loading alerts...</p>

@@ -6,7 +6,8 @@ const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/auth');
 const filmRoutes = require('./routes/film');
 const notificationRoutes = require('./routes/notificationRoutes');
-const commentRoutes = require('./routes/commentRoutes')
+const commentRoutes = require('./routes/commentRoutes');
+const seriesRoutes = require('./routes/seriesRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -31,6 +32,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/films', filmRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/series', seriesRoutes);
 
 // Start the server
 app.listen(PORT, () => {

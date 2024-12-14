@@ -1,3 +1,4 @@
+import { Series } from '@/types/Series';
 import React from 'react';
 
 interface UploadModalStepThreeProps {
@@ -7,7 +8,8 @@ interface UploadModalStepThreeProps {
     genre: string;
     thumbnail: File | null;
     thumbnailUrl: string | null;
-    series: string;
+    series: Series | null;
+    seriesList: Series[] | null;
     isCreatingNewSeries: boolean;
     handleVisibilityChange: (e: React.ChangeEvent<HTMLInputElement>) => void; // Function to handle visibility change
     handlePrevious: () => void; // Function to handle going back to the previous step

@@ -11,6 +11,7 @@ import Alerts from './pages/Alerts';
 import Profile from './pages/Profile';
 import Watch from './pages/Watch';
 import ProtectedRoute from './utils/ProtectedRoute';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="*" element={<NotFound />} />
           {/* Protected Routes Below */}
           <Route 
             path="/upload" 

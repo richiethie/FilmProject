@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
-import LeftFeedNav from '../components/LeftFeedNav';
 import axios from 'axios';
 import { IoMdTrendingUp } from 'react-icons/io';
+import { FaArrowLeftLong } from "react-icons/fa6"
 import { FaPlay } from "react-icons/fa";
 import { MdDoNotDisturb } from "react-icons/md";
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +13,17 @@ import ProfileFilmModal from '../components/ProfileFilmModal';
 import { User } from '../types/User';
 import { Film } from '../types/Film';
 import FollowButton from '../components/FollowButton';
+import FeedHeader from '@/components/FeedHeader';
+import { Tabs } from '@chakra-ui/react';
+import { HStack, Stack } from "@chakra-ui/react"
+import {
+  Skeleton,
+  SkeletonCircle,
+  SkeletonText,
+} from "@/components/ui/skeleton"
+import { Series } from '@/types/Series';
+
+
 
 
 const Profile = () => {
@@ -24,8 +35,12 @@ const Profile = () => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState<Partial<User>>({});
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
+  const [seriesList, setSeriesList] = useState<Series[] | null>(null);
+  const [selectedSeries, setSelectedSeries] = useState<Series | null>(null);
+
   const { token, loggedInUserId } = useAuth();
   const { userId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!userId) {
@@ -104,6 +119,27 @@ const Profile = () => {
     }
   };
 
+  const fetchUserSeries = async () => {
+    try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/series/user/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        });
+
+        console.log('User series:', response.data);
+        setSeriesList(response.data);
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            // Handle Axios specific error (optional, if you're using Axios)
+            console.error('Error fetching user series:', err.response?.data?.message || 'Server error');
+        } else {
+            // Handle general unknown error
+            console.error('Unknown error fetching user series:', err);
+        }
+    }
+  };
+
   const openFilmModal = (film: Film) => {
     setSelectedFilm(film);
   };
@@ -112,9 +148,11 @@ const Profile = () => {
     setSelectedFilm(null);
   };
 
+  const skeletonCount = films?.length || 9;
+
   return (
     <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
-      <LeftFeedNav />
+      <FeedHeader />
       <main className="flex-grow container max-w-[90%] sm:max-w-[80%] md:max-w-[60%] mx-auto px-4 py-8">
         {/* User Info Section */}
         <section className="flex items-center justify-between mb-8">
@@ -158,7 +196,8 @@ const Profile = () => {
         {/* Edit Modal */}
         {isEditModalOpen && (
           <EditProfileModal 
-            user={user} 
+            user={user}
+            films={films}
             isOpen={isEditModalOpen} 
             onClose={() => setEditModalOpen(false)} 
             handleEditProfile={handleEditProfile} 
@@ -168,58 +207,160 @@ const Profile = () => {
         )}
 
         {/* My Posts Section */}
-        <section>
-          <h2 className="text-2xl font-bold mb-4">My Posts</h2>
-          {loading ? (
-            <p>Loading films...</p>
-          ) : error ? (
-            <p>{error}</p>
-          ) : noFilms ? (
-            <div className='flex flex-col items-center justify-center mt-16'>
-              <MdDoNotDisturb className='text-5xl text-steelGray mb-4'/>
-              <p className='text-steelGray font-bold'>No films available</p>
+        {/* Tabs Section */}
+        <Tabs.Root lazyMount unmountOnExit defaultValue="home">
+          <Tabs.List>
+            <Tabs.Trigger className='p-4' value="home">Home</Tabs.Trigger>
+            <Tabs.Trigger className='p-4' value="series" onClick={fetchUserSeries}>Series</Tabs.Trigger>
+            <Tabs.Trigger className='p-4' value="premiere">Premiere</Tabs.Trigger>
+          </Tabs.List>
+          {/* Home Tab */}
+          <Tabs.Content value='home'>
+            {loading ? (
+              <div
+                className="grid gap-6"
+                style={{
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+                    maxWidth: '100%',
+                }}
+              >
+                  {Array.from({ length: skeletonCount }).map((_, index) => (
+                      <Stack gap="6" key={index}>
+                          <Skeleton className='rounded-lg' height="200px" />
+                          <HStack width="full">
+                              <SkeletonCircle size="10" />
+                              <SkeletonText noOfLines={2} />
+                          </HStack>
+                      </Stack>
+                  ))}
+              </div>
+            ) : error ? (
+              <p>{error}</p>
+            ) : noFilms ? (
+              <div className='flex flex-col items-center justify-center mt-16'>
+                <MdDoNotDisturb className='text-5xl text-steelGray mb-4'/>
+                <p className='text-steelGray font-bold'>No films available</p>
+              </div>
+            ) : (
+              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {films?.map((film, index) => (
+                  <div
+                    key={index}
+                    className="bg-charcoal rounded-lg overflow-hidden relative group"
+                    onClick={() => openFilmModal(film)}
+                  >
+                    <div className="relative w-full pb-[56.25%] cursor-pointer">
+                      <img
+                        src={film.thumbnailUrl}
+                        alt={film.title}
+                        className={`${
+                          film.rank && 'border-4 border-cornflowerBlue'
+                        } absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg`}
+                      />
+                      {film.rank && (
+                        <div className="absolute top-3 left-4 text-cornflowerBlue">
+                          <IoMdTrendingUp className="text-3xl" />
+                        </div>
+                      )}
+                      <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <FaPlay className="text-white text-4xl" />
+                      </div>
+                    </div>
+                    <div className="p-1">
+                      <h3 className="text-lg font-bold">{film.title}</h3>
+                      <p className="text-sm text-gray-400">{film.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Tabs.Content>
+
+          {/* Series Tab */}
+          <Tabs.Content value="series">
+        <div className="text-center">
+          {selectedSeries ? (
+            /* Render films from the selected series */
+            <div>
+              <button
+                className="flex items-center mt-6 py-2 px-4 bg-charcoal text-crispWhite font-semibold rounded-lg hover:bg-darkCharcoal transition-all"
+                onClick={() => setSelectedSeries(null)}
+              >
+                <FaArrowLeftLong className='mr-2' />
+                Back to Series
+              </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
+                {selectedSeries.films.map((film, index) => (
+                  <div
+                    key={index}
+                    className="bg-charcoal rounded-lg overflow-hidden relative group"
+                    onClick={() => navigate(`/films/${film._id}`)}
+                  >
+                    <div className="relative w-full pb-[56.25%] cursor-pointer">
+                      <img
+                        src={film.thumbnailUrl}
+                        alt={film.title}
+                        className={`${
+                          film.rank && 'border-4 border-cornflowerBlue'
+                        } absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg`}
+                      />
+                      {film.rank && (
+                        <div className="absolute top-3 left-4 text-cornflowerBlue">
+                          <IoMdTrendingUp className="text-3xl" />
+                        </div>
+                      )}
+                      <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <FaPlay className="text-white text-4xl" />
+                      </div>
+                    </div>
+                    <div className="p-1">
+                      <h3 className="text-lg font-bold">{film.title}</h3>
+                      <p className="text-sm text-gray-400">{film.description}</p>
+                    </div>
+                  </div>
+                ))}
+
+              </div>
             </div>
           ) : (
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {films?.map((film, index) => (
-                <div
-                  key={index}
-                  className="bg-charcoal rounded-lg overflow-hidden relative group"
-                  onClick={() => openFilmModal(film)}
-                >
-                  <div className="relative w-full pb-[56.25%] cursor-pointer">
-                    <img
-                      src={film.thumbnailUrl}
-                      alt={film.title}
-                      className={`${
-                        film.rank && 'border-4 border-cornflowerBlue'
-                      } absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg`}
-                    />
-                    {film.rank && (
-                      <div className="absolute top-3 left-4 text-cornflowerBlue">
-                        <IoMdTrendingUp className="text-3xl" />
-                      </div>
-                    )}
-                    <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <FaPlay className="text-4xl text-white" />
-                    </div>
-                  </div>
-                  <div className="p-4 flex justify-between items-center">
-                    <div>
-                      <h3 className="text-xl font-bold">{film.title}</h3>
-                      <p className="text-sm text-gray-400">by {film.uploadedBy?.username}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400">{film.votes.length} votes</p>
-                      {film.rank ? <p>RANK #{film.rank}</p> : <p>-</p>}
-                    </div>
-                  </div>
+            /* Render the list of series */
+            seriesList?.map((series, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center gap-2 py-4 px-16 my-8 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl"
+                onClick={() => setSelectedSeries(series)}
+              >
+                <div className="w-48 h-32 overflow-hidden rounded-md cursor-pointer group">
+                  <img
+                    src={series.films[0]?.thumbnailUrl}
+                    alt={series.films[0]?.title || 'Film thumbnail'}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
-              ))}
-            </div>
+                <div className="flex flex-col">
+                  <p
+                    className="text-lg font-semibold text-center truncate max-w-xs"
+                    title={series.title}
+                  >
+                    {series.title}
+                  </p>
+                  <p className="text-lg bg-charcoal p-2 rounded-xl font-semibold text-center truncate max-w-xs">
+                    {series.films.length} films
+                  </p>
+                </div>
+              </div>
+            ))
           )}
-        </section>
+        </div>
+      </Tabs.Content>
+
+          {/* Premieres Tab */}
+          <Tabs.Content value="premiere">
+            <div className="text-center">
+              <p className="text-gray-400">No premieres scheduled yet. Stay tuned!</p>
+            </div>
+          </Tabs.Content>
+        </Tabs.Root>
       </main>
 
       <ProfileFilmModal 

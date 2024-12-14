@@ -15,6 +15,7 @@ import { Film } from '../types/Film';
 import { User } from '../types/User';
 import Comment from '../components/Comment';
 import TopTenFilms from '../components/TopTenFilms';
+import FeedHeader from '@/components/FeedHeader';
 
 const Explore = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -82,7 +83,7 @@ const Explore = () => {
 
     return (
         <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
-            <LeftFeedNav />
+            <FeedHeader />
             <main className="flex-grow container max-w-[60%] mx-auto px-4 py-8">
                 {/* INPUT */}
                 <div className="flex justify-center items-center mb-6">

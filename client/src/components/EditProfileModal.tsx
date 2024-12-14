@@ -2,10 +2,27 @@ import { useState } from "react";
 import { useAuth } from '../context/AuthContext';
 import stockProfilePic from "../assets/img/profilePic/stock-profile-pic.webp"
 import { User } from "../types/User";
+import { Film } from "../types/Film";
+import { Button } from "@/components/ui/button"
+import {
+  MenuContent,
+  MenuItem,
+  MenuRoot,
+  MenuTrigger,
+} from "@/components/ui/menu"
+import { HStack, Stack } from "@chakra-ui/react"
+import {
+  Skeleton,
+  SkeletonCircle,
+  SkeletonText,
+} from "@/components/ui/skeleton"
+import { IoMdTrendingUp } from "react-icons/io";
+import { FaPlay } from "react-icons/fa";
 
 
 interface EditProfileModalProps {
   user: User | null;
+  films: Film[] | null;
   isOpen: boolean;
   onClose: () => void;
   handleEditProfile: () => void;
@@ -14,9 +31,10 @@ interface EditProfileModalProps {
 }
 
 const EditProfileModal = (props: EditProfileModalProps) => {
-  const { user, isOpen, onClose, handleEditProfile, updatedProfile, setUpdatedProfile } = props;
+  const { user, films, isOpen, onClose, handleEditProfile, updatedProfile, setUpdatedProfile } = props;
 
   const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [featuredFilm, setFeaturedFilm] = useState<Film | null>(null);
 
   const { token } = useAuth();
 
@@ -61,34 +79,93 @@ const EditProfileModal = (props: EditProfileModalProps) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-      <div className="bg-charcoal p-8 rounded-lg shadow-lg max-w-5xl w-full">
+      <div className="bg-charcoal p-20 rounded-lg shadow-lg max-w-5xl w-full">
         <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
 
         {/* Profile Image Upload */}
-        <div className="mb-4">
-          <label className="block mb-2">Profile Picture:</label>
-          <div className="flex items-center mb-4">
-            <img
-              src={updatedProfile.profilePhotoUrl || user?.profilePhotoUrl || stockProfilePic}
-              alt="Profile"
-              className="w-36 h-36 rounded-full object-cover mr-4"
-            />
+        <div className="mb-4 flex flex-col w-full h-full">
+          <div className="h-full flex items-center justify-between bg-darkCharcoal rounded-xl py-4 px-10 mb-4">
+            <div className="flex items-center">
+              <div className="flex items-center">
+                <img
+                  src={updatedProfile.profilePhotoUrl || user?.profilePhotoUrl || stockProfilePic}
+                  alt="Profile"
+                  className="w-36 h-36 rounded-full object-cover mr-4"
+                />
+              </div>
+              <label className="font-semibold text-2xl">{user?.username}</label>
+            </div>
+            {/* Custom file input button */}
+            <div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+                id="file-upload"
+              />
+              <label htmlFor="file-upload" className="bg-cornflowerBlue text-white px-4 py-2 rounded-lg cursor-pointer">
+                Choose New Image
+              </label>
+            </div>
           </div>
-          {/* Custom file input button */}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-            id="file-upload"
-          />
-          <label htmlFor="file-upload" className="bg-cornflowerBlue text-white px-4 py-2 rounded-lg cursor-pointer">
-            Choose New Image
-          </label>
+          <div className="flex items-center justify-between bg-darkCharcoal rounded-xl py-4 px-10 mb-4">
+            <div className="w-[50%]">
+              {(featuredFilm != null) ? (
+                <div>
+                  <label className="block mb-2">Featured Preview:</label>
+                  <div className="relative w-full pb-[45.25%] cursor-pointer">
+                    <img
+                      src={featuredFilm?.thumbnailUrl}
+                      alt={featuredFilm?.title}
+                      className={`${
+                        featuredFilm?.rank && 'border-4 border-cornflowerBlue'
+                      } absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg`}
+                    />
+                    {featuredFilm?.rank && (
+                      <div className="absolute top-3 left-4 text-cornflowerBlue">
+                        <IoMdTrendingUp className="text-3xl" />
+                      </div>
+                    )}
+                      <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <FaPlay className="text-white text-4xl" />
+                      </div>
+                  </div>
+                  <p className="mt-1">{featuredFilm.title}</p>
+                  <p className="text-steelGray">
+                    {featuredFilm.description
+                      ? featuredFilm.description.length > 32
+                        ? `${featuredFilm.description.slice(0, 32)}...`
+                        : featuredFilm.description
+                      : ''}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block mb-2">No Featured Film:</label>
+                  <div className="relative w-full pb-[45.25%] cursor-pointer bg-charcoal my-2 rounded-lg"></div>
+                  <div className="bg-charcoal h-8 w-[50%] my-2 rounded-lg"></div>
+                  <div className="bg-charcoal h-8 w-[50%] my-2 rounded-lg"></div>
+                </div>
+              )}
+            </div>
+            <MenuRoot>
+              <MenuTrigger asChild>
+                <Button className="bg-cornflowerBlue text-white px-4 py-2 rounded-lg cursor-pointer">
+                  Set Featured Film
+                </Button>
+              </MenuTrigger>
+              <MenuContent>
+                {films?.map((film, index) => (
+                  <MenuItem id={film._id} value={index.toString()} onClick={() => setFeaturedFilm(film)}>{film.title}</MenuItem>
+                ))}
+              </MenuContent>
+            </MenuRoot>
+          </div>
         </div>
 
         {/* Username Field */}
-        <label className="block mb-2">
+        <label className="block mb-2 mt-8">
           Username:
           <input
             type="text"
@@ -96,7 +173,7 @@ const EditProfileModal = (props: EditProfileModalProps) => {
             onChange={(e) =>
               setUpdatedProfile({ ...updatedProfile, username: e.target.value })
             }
-            className="w-full p-2 border rounded text-black"
+            className="w-full p-2  rounded text-crispWhite"
           />
         </label>
 
@@ -108,23 +185,24 @@ const EditProfileModal = (props: EditProfileModalProps) => {
             onChange={(e) =>
               setUpdatedProfile({ ...updatedProfile, bio: e.target.value })
             }
-            className="w-full p-2 border rounded text-black"
+            className="w-full p-2  rounded text-crispWhite"
           />
         </label>
+        <div className="flex justify-end items-center mt-4">
+          <button
+            onClick={handleEditProfile}
+            className="bg-cornflowerBlue text-white px-4 py-2 rounded-lg"
+          >
+            Save Changes
+          </button>
 
-        <button
-          onClick={handleEditProfile}
-          className="bg-cornflowerBlue text-white px-4 py-2 mt-4 rounded-lg"
-        >
-          Save Changes
-        </button>
-
-        <button
-          onClick={onClose}
-          className="text-gray-600 px-4 py-2 mt-2"
-        >
-          Cancel
-        </button>
+          <button
+            onClick={onClose}
+            className="text-gray-600 px-4 py-2"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );

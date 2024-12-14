@@ -5,7 +5,10 @@ export interface Film {
     thumbnailUrl: string;
     filmUrl: string;
     genre?: string;
-    series?: string;
+    series?: {
+        _id: string;
+        title: string;
+    }
     duration?: number;
     rank: number | null;
     visibility: 'private' | 'unlisted' | 'public';

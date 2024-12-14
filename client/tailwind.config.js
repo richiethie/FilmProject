@@ -7,10 +7,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        montserrat: ['Montserrat', 'sans-serif'],
+        sans: ['Poppins', 'sans-serif'],
       },
       colors: {
         charcoal: '#10161c',
+        darkCharcoal: '#080c0f',
         cornflowerBlue: '#4f76f6',
         crispWhite: '#f9f9f9',
         mintGreen: '#77f2a1',
@@ -20,5 +21,4 @@ export default {
     },
   },
   plugins: [],
-}
-
+};

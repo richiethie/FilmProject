@@ -46,7 +46,7 @@ const CategoryPills = ({categories, selectedCategory, onSelect}: CategoryPillPro
                         key={category}
                         onClick={() => onSelect(category)}
                         // variant={selectedCategory === category ? "dark" : "default"} 
-                        className={`py-1 px-3 rounded-lg border border-steelGray ${selectedCategory === category ? "bg-cornflowerBlue" : "bg-transparent"} whitespace-nowrap`}
+                        className={`py-1 px-3 rounded-lg ${selectedCategory === category ? "bg-cornflowerBlue" : "bg-darkCharcoal"} whitespace-nowrap`}
                     >
                         {category}
                     </button>

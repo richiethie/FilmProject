@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import signupBg from '../assets/video/signup-bg.mp4';
 import SignupHeader from '../components/SignupHeader';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
+import { PasswordInput } from "@/components/ui/password-input"
 
 interface FormData {
   username: string;
@@ -128,7 +129,7 @@ const Signup = () => {
               <label className="block text-sm font-medium text-crispWhite" htmlFor="password">
                 Password
               </label>
-              <input
+              <PasswordInput
                 type="password"
                 id="password"
                 name="password"
@@ -142,7 +143,7 @@ const Signup = () => {
               <label className="block text-sm font-medium text-crispWhite" htmlFor="confirmPassword">
                 Confirm Password
               </label>
-              <input
+              <PasswordInput
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"

@@ -3,6 +3,7 @@ import loginBg from '../assets/video/signup-bg.mp4'; // Ensure you have a login 
 import SignupHeader from '../components/SignupHeader';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; // Import useAuth hook
+import { PasswordInput } from "@/components/ui/password-input"
 
 interface FormData {
   username: string;
@@ -87,7 +88,7 @@ const Login = () => {
             </div>
             <div className="mb-6">
               <label className="block text-sm font-medium text-crispWhite" htmlFor="password">Password</label>
-              <input
+              <PasswordInput
                 type="password"
                 id="password"
                 name="password"
