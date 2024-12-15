@@ -1,17 +1,25 @@
+import { Link } from 'react-router-dom';
+
 const Header = () => {
 
     return (
-        <header className="flex justify-between items-center p-4 bg-darkBlue text-white">
-            <div className="text-xl font-bold">FilmShare</div>
+        <header
+        className="absolute top-0 left-0 w-full flex justify-between items-center pt-8 px-20 text-crispWhite bg-transparent z-20"
+        style={{ boxShadow: '0 35px 35px rgba(0, 0, 0, 0.6) inset' }}
+        >
+            <Link to="/" className="text-4xl font-bold">Film<span className="text-cornflowerBlue">Share</span></Link>
             <nav>
-            <ul className="flex space-x-4">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#upload" className="bg-burntOrange px-4 py-2 rounded">Upload Film</a></li>
-                <li><a href="#login" className="bg-burntOrange px-4 py-2 rounded">Login</a></li>
-            </ul>
+                <ul className="flex space-x-4">
+                <li>
+                    <Link to="/login" className="bg-cornflowerBlue hover:bg-steelGray px-4 py-2 rounded">
+                        Sign In
+                    </Link>
+                </li>
+                </ul>
             </nav>
         </header>
+
+
     )
 }
 
