@@ -7,6 +7,7 @@ import FollowButton from '../components/FollowButton';
 import ProfileLink from '../components/ProfileLink';
 import { useNavigate } from "react-router-dom";
 import FeedHeader from '@/components/FeedHeader';
+import { formatDistanceToNow, format } from 'date-fns';
 
 const Alerts = () => {
     const [alerts, setAlerts] = useState<Notification[]>([]); // Type defined using Notification interface
@@ -83,7 +84,7 @@ const Alerts = () => {
                               </div>
                             )}
                             <p className="text-sm text-steelGray">
-                              {new Date(alert.createdAt).toLocaleString()}
+                              {formatDistanceToNow(new Date(alert.createdAt), { addSuffix: true })}
                             </p>
                           </div>
                           {alert.type === 'Vote' || alert.type === 'Comment' ? (
