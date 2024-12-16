@@ -6,7 +6,14 @@
   ],
   "compilerOptions": {
     "types": ["node"],
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "allowUnusedLabels": true,
+    "noUnusedLocals": false,        // Ignore unused variables in the TypeScript build
+    "noUnusedParameters": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true
     // other options
   }
 }
