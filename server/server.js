@@ -18,7 +18,7 @@ connectDB();
 // Middleware
 // Enable CORS for all origins or specify frontend URL
 const corsOptions = {
-  origin: 'http://localhost:5173', // Adjust this based on where your frontend is hosted
+  origin: 'https://filmshare.vercel.app/', // Adjust this based on where your frontend is hosted
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
