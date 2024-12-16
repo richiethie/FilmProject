@@ -17,7 +17,7 @@ connectDB();
 
 // Enable CORS with full setup
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'https://filmshare.vercel.app');
+  res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -27,8 +27,8 @@ app.use((req, res, next) => {
 // Middleware
 // Enable CORS for all origins or specify frontend URL
 const corsOptions = {
-  origin: process.env.FRONTEND_URL ||  'https://filmshare.vercel.app/', // Adjust this based on where your frontend is hosted
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: process.env.FRONTEND_URL, // Adjust this based on where your frontend is hosted
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
