@@ -40,3 +40,9 @@
 body {
     font-family: 'Poppins', sans-serif !important;
 }
+
+.text-outline-white {
+    -webkit-text-stroke: 1px white; /* Thin white outline */
+    -webkit-text-fill-color: rgba(0, 0, 0, 0.705); /* Transparent gray fill */
+    color: transparent; /* Ensures only the fill color applies */
+}

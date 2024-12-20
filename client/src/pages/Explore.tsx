@@ -16,6 +16,8 @@ import { User } from '../types/User';
 import Comment from '../components/Comment';
 import TopTenFilms from '../components/TopTenFilms';
 import FeedHeader from '@/components/FeedHeader';
+import { useIsMobile } from '@/context/MobileContext';
+import { formatDistanceToNow } from 'date-fns';
 
 const Explore = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -29,6 +31,7 @@ const Explore = () => {
 
     const { token } = useAuth();
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
@@ -84,9 +87,9 @@ const Explore = () => {
     return (
         <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
             <FeedHeader />
-            <main className="flex-grow container max-w-[60%] mx-auto px-4 py-8">
+            <main className={`flex-grow container ${isMobile ? ("w-full") : ("max-w-[80%]")} mx-auto py-8`}>
                 {/* INPUT */}
-                <div className="flex justify-center items-center mb-6">
+                <div className="flex justify-center items-center px-4 mb-6">
                     <div className="flex flex-grow items-center bg-charcoal max-w-[600px] h-12">
                         <input
                             type="text"
@@ -124,7 +127,7 @@ const Explore = () => {
                     </div>
                 )}
 
-                <TopTenFilms />
+                
 
                 {/* Content Section */}
                 <section className="mb-12 mt-8">
@@ -132,38 +135,76 @@ const Explore = () => {
                         <p className="text-center">Loading...</p>
                     ) : viewMode === 'films' ? (
                         <>
+                            <TopTenFilms />
                             <h1 className="text-4xl font-bold mb-6">Your Feed</h1>
-                            <div className="grid gap-6 grid-cols-1">
+                            <div 
+                                className={`${!isMobile && ("grid gap-6")}`}
+                                style={{
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+                                    maxWidth: '100%',
+                                }}
+                            >
                                 {filteredFilms?.map((film) => (
-                                    <div key={film._id} className="bg-charcoal rounded-lg overflow-hidden mt-8">
-                                        <div className="relative group cursor-pointer" onClick={() => navigate(`/films/${film._id}`)}>
-                                            <img
-                                                src={film.thumbnailUrl}
-                                                alt={film.title}
-                                                className="aspect-w-16 aspect-h-9 w-full object-cover rounded-lg shadow-lg"
-                                            />
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg">
-                                                <button className="text-crispWhite text-4xl">
-                                                    <FaPlay />
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="flex-grow p-4">
-                                            <div className="flex justify-between items-center">
-                                                <div>
-                                                    <h3 className="text-xl font-bold">{film.title}</h3>
-                                                    <p className="text-sm text-gray-400">by <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} /></p>
+                                    <>
+                                        {isMobile ? (
+                                            <div key={film._id} className="bg-charcoal overflow-hidden mt-4 group">
+                                                <div
+                                                    className="relative w-full pb-[60%] cursor-pointer"
+                                                    onClick={() => navigate(`/films/${film._id}`)}
+                                                >
+                                                    <img
+                                                        src={film.thumbnailUrl}
+                                                        alt={film.title}
+                                                        className="absolute top-0 left-0 w-full h-full object-cover shadow-lg"
+                                                    />
                                                 </div>
-                                                <div className="flex space-x-4 items-center">
-                                                    <Vote filmId={film._id} />
-                                                    <Comment filmId={film._id}/>
-                                                    <button className="text-crispWhite hover:text-cornflowerBlue">
-                                                        <FiSend className="text-2xl" />
-                                                    </button>
+                                                <div className="flex-grow py-2">
+                                                    <div className="flex justify-between px-2 items-center">
+                                                        <div>
+                                                            <h3 className="text-lg font-bold">{film.title}</h3>
+                                                            <p className="text-xs text-gray-400"><ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} /> • {formatDistanceToNow(new Date(film.createdAt), { addSuffix: true })}</p>
+                                                        </div>
+                                                        <div className="flex space-x-2 items-center">
+                                                            <Vote filmId={film._id} />
+                                                            <Comment filmId={film._id} />
+                                                            {/* <button className="text-crispWhite border border-steelGray px-3 py-1 rounded-full hover:text-cornflowerBlue">
+                                                                <FiSend className="text-xl" />
+                                                            </button> */}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
+                                        ) : (
+
+                                            <div key={film._id} className="bg-charcoal rounded-lg overflow-hidden mt-8 group">
+                                                <div className="relative w-full pb-[60%] cursor-pointer" onClick={() => navigate(`/films/${film._id}`)}>
+                                                    <img
+                                                        src={film.thumbnailUrl}
+                                                        alt={film.title}
+                                                        className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg"
+                                                    />
+                                                    <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                                        <FaPlay className="text-crispWhite text-4xl"/>
+                                                    </div>
+                                                </div>
+                                                <div className="flex-grow p-4">
+                                                    <div className="flex justify-between items-center">
+                                                        <div>
+                                                            <h3 className="text-xl font-bold">{film.title}</h3>
+                                                            <p className="text-sm text-gray-400">by <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} /></p>
+                                                        </div>
+                                                        <div className="flex space-x-4 items-center">
+                                                            <Vote filmId={film._id} />
+                                                            <Comment filmId={film._id}/>
+                                                            <button className="text-crispWhite hover:text-cornflowerBlue">
+                                                                <FiSend className="text-2xl" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
                                 ))}
                             </div>
                         </>

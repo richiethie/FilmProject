@@ -51,3 +51,17 @@ exports.getUserSeries = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+exports.getSeriesById = async (req, res) => {
+    const { seriesId } = req.params;
+    try {
+        const series = await Series.findById(seriesId);
+        if (!series) {
+            return res.status(404).json({ message: 'No series found for this user' });
+        }
+        res.status(200).json(series);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

@@ -26,11 +26,23 @@
     transform: translateY(-50%); /* Adjust position to be centered */
 }
 
-.swiper-pagination-bullet {
-    background-color: #64696e; /* Your steelGray color */
-    opacity: 1; /* Ensure the color is fully opaque */
+.custom-swiper-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    margin-top: 16px;
 }
 
-.swiper-pagination-bullet-active {
-    background-color: #f9f9f9; /* Your steelGray color for the active dot */
+.custom-bullet {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.custom-bullet .swiper-pagination-bullet-active {
+    background-color: #f2f7fd; /* Active bullet color */
 }

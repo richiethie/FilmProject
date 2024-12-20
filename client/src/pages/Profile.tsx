@@ -5,7 +5,7 @@ import axios from 'axios';
 import { IoMdTrendingUp } from 'react-icons/io';
 import { FaArrowLeftLong } from "react-icons/fa6"
 import { FaPlay } from "react-icons/fa";
-import { MdDoNotDisturb } from "react-icons/md";
+import { MdDoNotDisturb, MdModeEdit } from "react-icons/md";
 import { useAuth } from '../context/AuthContext';
 import EditProfileModal from '../components/EditProfileModal';
 import stockProfilePic from "../assets/img/profilePic/stock-profile-pic.webp";
@@ -22,6 +22,7 @@ import {
   SkeletonText,
 } from "@/components/ui/skeleton"
 import { Series } from '@/types/Series';
+import { useIsMobile } from '@/context/MobileContext';
 
 
 
@@ -41,6 +42,7 @@ const Profile = () => {
   const { token, loggedInUserId } = useAuth();
   const { userId } = useParams();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!userId) {
@@ -153,44 +155,89 @@ const Profile = () => {
   return (
     <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
       <FeedHeader />
-      <main className="flex-grow container max-w-[90%] sm:max-w-[80%] md:max-w-[60%] mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 py-8">
         {/* User Info Section */}
-        <section className="flex items-center justify-between mb-8">
-          <div className="flex items-center">
-            <div className="w-24 h-24 mr-6">
-              <img
-                src={user?.profilePhotoUrl || stockProfilePic}
-                alt={`${user?.username}'s profile`}
-                className="w-full h-full rounded-full object-cover"
-              />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">{user?.username || 'Username'}</h1>
-              <p className="text-sm text-gray-400">{user?.bio || 'No bio available'}</p>
-              <div className="flex gap-4 mt-2">
-                <p>
-                  <span className="font-bold">{films?.length || 0}</span> Films
-                </p>
-                <p>
-                  <span className="font-bold">{user?.followersCount || 0}</span> Followers
-                </p>
-                <p>
-                  <span className="font-bold">{user?.followingCount || 0}</span> Following
-                </p>
+        {isMobile ? (
+          <section className='flex flex-col px-2'>
+            <div className="flex items-center justify-between w-full">
+              <div className="w-16 h-16">
+                <img
+                  src={user?.profilePhotoUrl || stockProfilePic}
+                  alt={`${user?.username}'s profile`}
+                  className="w-full h-full rounded-full object-cover"
+                />
+              </div>
+              <div className='flex flex-col items-center'>
+                <span className="font-bold">{films?.length || 0}</span>
+                <p className='text-xs'>Films</p>
+              </div>
+              <div className='flex flex-col items-center'>
+                <span className="font-bold">{user?.followersCount || 0}</span>
+                <p className='text-xs'>Followers</p>
+              </div>
+              <div className='flex flex-col items-center'>
+                <span className="font-bold">{user?.followingCount || 0}</span>
+                <p className='text-xs'>Following</p>
               </div>
             </div>
-          </div>
-          {loggedInUserId === userId ? (
-            <button
-              onClick={() => setEditModalOpen(true)}
-              className="bg-cornflowerBlue text-white px-4 py-2 rounded-lg h-10 min-w-max whitespace-nowrap"
-            >
-              Edit Profile
-            </button>
-          ) : (
-            <FollowButton targetUserId={userId || ''} token={token || ''}/>
-          )}
-        </section>
+            <div className='flex flex-col mt-2'>
+              <h1 className="text-lg font-bold">{user?.username || 'Username'}</h1>
+              <p className="text-sm text-gray-400">{user?.bio || 'No bio available'}</p>
+              <div className='flex mt-1 w-full'>
+              {loggedInUserId === userId ? (
+                <>
+                  <button className='py-2 px-10 w-[90%] bg-darkCharcoal rounded-full text-xs font-semibold mr-2' onClick={() => navigate(`/upload`)}>Manage Films</button>
+                  <button
+                    onClick={() => navigate(`/profile/edit-profile/${loggedInUserId}`)}
+                    className="bg-darkCharcoal rounded-full text-white text-sm px-3 min-w-max whitespace-nowrap"
+                  >
+                    <MdModeEdit className='text-lg'/>
+                  </button>
+                </>
+              ) : (
+                <FollowButton targetUserId={userId || ''} token={token || ''}/>
+              )}
+              </div>
+            </div>
+          </section>
+        ) : (
+          <section className="flex items-center justify-between mb-8">
+            <div className="flex items-center">
+              <div className="w-24 h-24 mr-6">
+                <img
+                  src={user?.profilePhotoUrl || stockProfilePic}
+                  alt={`${user?.username}'s profile`}
+                  className="w-full h-full rounded-full object-cover"
+                />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">{user?.username || 'Username'}</h1>
+                <p className="text-sm text-gray-400">{user?.bio || 'No bio available'}</p>
+                <div className="flex gap-4 mt-2">
+                  <p>
+                    <span className="font-bold">{films?.length || 0}</span> Films
+                  </p>
+                  <p>
+                    <span className="font-bold">{user?.followersCount || 0}</span> Followers
+                  </p>
+                  <p>
+                    <span className="font-bold">{user?.followingCount || 0}</span> Following
+                  </p>
+                </div>
+              </div>
+            </div>
+            {loggedInUserId === userId ? (
+              <button
+                onClick={() => setEditModalOpen(true)}
+                className="bg-cornflowerBlue text-white px-4 py-2 rounded-lg h-10 min-w-max whitespace-nowrap"
+              >
+                Edit Profile
+              </button>
+            ) : (
+              <FollowButton targetUserId={userId || ''} token={token || ''}/>
+            )}
+          </section>
+        )}
 
 
         {/* Edit Modal */}
@@ -247,7 +294,7 @@ const Profile = () => {
                   <div
                     key={index}
                     className="bg-charcoal rounded-lg overflow-hidden relative group"
-                    onClick={() => openFilmModal(film)}
+                    onClick={() => navigate(`/films/${film._id}`)}
                   >
                     <div className="relative w-full pb-[56.25%] cursor-pointer">
                       <img
@@ -325,29 +372,53 @@ const Profile = () => {
           ) : (
             /* Render the list of series */
             seriesList?.map((series, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center gap-2 py-4 px-16 my-8 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl"
-                onClick={() => setSelectedSeries(series)}
-              >
-                <div className="w-48 h-32 overflow-hidden rounded-md cursor-pointer group">
-                  <img
-                    src={series.films[0]?.thumbnailUrl}
-                    alt={series.films[0]?.title || 'Film thumbnail'}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <p
-                    className="text-lg font-semibold text-center truncate max-w-xs"
-                    title={series.title}
+              <div key={index}>
+                {isMobile ? (
+                  <div onClick={() => setSelectedSeries(series)} className='flex justify-between items-center gap-2 py-4 px-4 mb-4 mt-2 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl'>
+                    <div className='w-24 h-16 overflow-hidden rounded-md cursor-pointer group'>
+                        <img
+                            src={series?.films[0]?.thumbnailUrl}
+                            alt={series?.films[0]?.title || 'Film thumbnail'}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                    </div>
+                    <div className="flex items-center">
+                        <p
+                            className="text-md font-semibold text-center truncate max-w-xs mr-2"
+                            title={series?.title}
+                        >
+                            {series?.title}
+                        </p>
+                        <p className="text-md bg-charcoal p-2 rounded-xl font-semibold text-center truncate max-w-xs">
+                            {series?.films.length} films
+                        </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className="flex justify-between items-center gap-2 py-4 px-16 my-8 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl"
+                    onClick={() => setSelectedSeries(series)}
                   >
-                    {series.title}
-                  </p>
-                  <p className="text-lg bg-charcoal p-2 rounded-xl font-semibold text-center truncate max-w-xs">
-                    {series.films.length} films
-                  </p>
-                </div>
+                    <div className="w-48 h-32 overflow-hidden rounded-md cursor-pointer group">
+                      <img
+                        src={series.films[0]?.thumbnailUrl}
+                        alt={series.films[0]?.title || 'Film thumbnail'}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <p
+                        className="text-lg font-semibold text-center truncate max-w-xs"
+                        title={series.title}
+                      >
+                        {series.title}
+                      </p>
+                      <p className="text-lg bg-charcoal p-2 rounded-xl font-semibold text-center truncate max-w-xs">
+                        {series.films.length} films
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             ))
           )}
