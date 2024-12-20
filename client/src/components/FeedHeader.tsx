@@ -4,11 +4,12 @@ import { Input } from '@chakra-ui/react';
 import { FaBars } from 'react-icons/fa';
 import { FiUpload } from "react-icons/fi";
 import { useAuth } from '@/context/AuthContext';
+import { useIsMobile } from '@/context/MobileContext';
 import { User } from '@/types/User';
 import axios from 'axios';
 import stockProfilePic from "../assets/img/profilePic/stock-profile-pic.webp";
 import { GoHomeFill } from 'react-icons/go';
-import { IoNotifications, IoSearch, IoNotificationsOutline, IoTrendingUp, IoPulseSharp, IoSettingsSharp, IoBookmark } from 'react-icons/io5';
+import { IoNotifications, IoSearch, IoNotificationsOutline, IoTrendingUp, IoPulseSharp, IoSettingsSharp, IoBookmark, IoSearchOutline } from 'react-icons/io5';
 import { PiFilmSlate } from "react-icons/pi";
 import { MdOutlineTheaterComedy } from "react-icons/md";
 import { FaFaceLaughBeam, FaWandMagicSparkles } from "react-icons/fa6";
@@ -22,6 +23,7 @@ const FeedHeader = () => {
 
     const { logout, userId } = useAuth();
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
 
     const handleLogout = () => {
         logout();
@@ -29,6 +31,12 @@ const FeedHeader = () => {
     };
 
     const toggleDrawer = () => setDrawerOpen((prev) => !prev);
+
+    const handleSearchClick = () => {
+        if (isMobile) {
+          navigate('/search');
+        }
+    };
 
     useEffect(() => {
         const fetchCurrentUser = async () => {
@@ -51,7 +59,7 @@ const FeedHeader = () => {
     }, [userId]);
 
     return (
-        <header className="sticky top-0 z-10 bg-charcoal px-4 py-2">
+        <header className="sticky top-0 z-50 bg-charcoal px-4 py-2">
             <div className="flex items-center justify-between">
                 {/* Left: Drawer Icon */}
                 <div className='flex items-center'>
@@ -167,28 +175,40 @@ const FeedHeader = () => {
                     </div>
                 )}
 
-                {/* Center: Search Bar */}
-                <Input
-                    placeholder="Search"
-                    size="md"
-                    bg="charcoal"
-                    color="white"
-                    _placeholder={{ color: 'gray.300' }}
-                    borderWidth="1px"
-                    borderRadius="md"
-                    w="40%"
-                    className='border-steelGray px-4'
-                />
+                {/* Center: Search Bar or Icon */}
+                {!isMobile && (
+                    <Input
+                        placeholder="Search"
+                        size="md"
+                        bg="charcoal"
+                        color="white"
+                        _placeholder={{ color: 'gray.300' }}
+                        borderWidth="1px"
+                        borderRadius="md"
+                        w="40%"
+                        className="border-steelGray px-4"
+                    />
+                )}
 
                 {/* Right: Profile Picture and Upload Icon */}
                 <div className="flex items-center gap-4">
-                    <Link
-                        to="/upload"
-                        aria-label="Upload"
-                        className="text-white text-2xl p-2 hover:text-cornflowerBlue"
-                    >
-                        <FiUpload />
-                    </Link>
+                    {isMobile ? (
+                        <button
+                            onClick={handleSearchClick}
+                            aria-label="Search"
+                            className="text-white text-2xl p-2 hover:text-cornflowerBlue"
+                        >
+                            <IoSearchOutline />
+                        </button>
+                    ) : (
+                        <Link
+                            to="/upload"
+                            aria-label="Upload"
+                            className="text-white text-2xl p-2 hover:text-cornflowerBlue"
+                        >
+                            <FiUpload />
+                        </Link>
+                    )}
                     <Link
                         to="/alerts"
                         aria-label="Alerts"

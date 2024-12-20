@@ -1,3 +1,5 @@
+import { useIsMobile } from "@/context/MobileContext"
+import { Box, Button, HStack } from "@chakra-ui/react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
@@ -14,6 +16,8 @@ const CategoryPills = ({categories, selectedCategory, onSelect}: CategoryPillPro
     const [isRightVisible, setIsRightVisible] = useState(false)
     const [translate, setTranslate] = useState(0)
     const containerRef = useRef<HTMLDivElement>(null)
+
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         if (containerRef.current == null) return
@@ -34,6 +38,32 @@ const CategoryPills = ({categories, selectedCategory, onSelect}: CategoryPillPro
             observer.disconnect()
         }
     }, [categories, translate])
+
+    if (isMobile) {
+        return (
+          <Box
+            overflowX="scroll"
+            scrollbar="hidden"
+            display="flex"
+            scrollSnapType="x mandatory"
+            px={2}
+            className="overflow-hidden"
+          >
+            <HStack as="ul">
+              {categories.map((category) => (
+                <button 
+                    key={category}
+                    onClick={() => onSelect(category)}
+                    // variant={selectedCategory === category ? "dark" : "default"} 
+                    className={`py-1 px-3 rounded-lg ${selectedCategory === category ? "bg-cornflowerBlue" : "bg-darkCharcoal"} whitespace-nowrap`}
+                >
+                    {category}
+                </button>
+              ))}
+            </HStack>
+          </Box>
+        );
+    }
 
     return (
         <div className="overflow-x-hidden relative" ref={containerRef}>

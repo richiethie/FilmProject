@@ -140,16 +140,24 @@ exports.getFilms = async (req, res) => {
 
 exports.getFilmById = async (req, res) => {
   const { id } = req.params;
+
   // Check if the ID is a valid MongoDB ObjectId
   if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid Film ID' });
   }
 
   try {
-      const film = await Film.findById(id).populate('uploadedBy', 'username');
+      // Increment the views and populate the `uploadedBy` field in one step
+      const film = await Film.findByIdAndUpdate(
+          id,
+          { $inc: { views: 1 } }, // Increment the views field
+          { new: true } // Return the updated document
+      ).populate('uploadedBy', 'username').populate('series', '_id title');
+
       if (!film) {
           return res.status(404).json({ message: 'Film not found' });
       }
+
       res.json(film);
   } catch (error) {
       console.error('Error fetching film:', error);
@@ -224,7 +232,7 @@ exports.deleteFilm = async (req, res) => {
 exports.voteFilm = async (req, res) => {
   try {
     const { filmId } = req.params;
-    const userId = req.user; // Ensure `req.user.id` has the proper user ID
+    const userId = req.user; // Ensure `req.user` contains the proper user ID
     const { isUpvote } = req.body; // Whether it's an upvote (true) or a downvote (false)
 
     // Fetch film details
@@ -233,29 +241,42 @@ exports.voteFilm = async (req, res) => {
       return res.status(404).json({ message: 'Film not found' });
     }
 
-    // Ensure votes field is initialized to an empty array if not present
+    // Ensure votes and downvotes fields are initialized as arrays if not present
     if (!Array.isArray(film.votes)) {
       film.votes = [];
     }
+    if (!Array.isArray(film.downvotes)) {
+      film.downvotes = [];
+    }
 
-    // Check if the user has already voted
     const userHasVoted = film.votes.includes(userId);
+    const userHasDownvoted = film.downvotes.includes(userId);
 
     if (isUpvote) {
-      // If the user is upvoting and hasn't voted yet, add their userId to the array
+      // Handle upvote
       if (!userHasVoted) {
+        // Add userId to upvotes if not already voted
         film.votes.push(userId);
       }
 
-      // Create a notification for the film owner (uploadedBy)
+      // Remove userId from downvotes if it exists
+      if (userHasDownvoted) {
+        film.downvotes = film.downvotes.filter((downvote) => downvote !== userId);
+      }
+
+      // Create a notification for the film owner
       const filmOwnerId = film.uploadedBy._id; // Get the film owner's ID
-      // Avoid sending a notification to the user who voted
-      // if (filmOwnerId.toString() !== userId.toString()) {
-        await createNotification('Vote', filmOwnerId, userId, filmId); // Notify the film owner about the vote
-      //}
-      
+      if (filmOwnerId.toString() !== userId.toString()) {
+        await createNotification('Vote', filmOwnerId, userId, filmId); // Notify the film owner about the upvote
+      }
     } else {
-      // If the user is removing their vote (downvoting), remove their userId from the array
+      // Handle downvote
+      if (!userHasDownvoted) {
+        // Add userId to downvotes if not already downvoted
+        film.downvotes.push(userId);
+      }
+
+      // Remove userId from upvotes if it exists
       if (userHasVoted) {
         film.votes = film.votes.filter((vote) => vote !== userId);
 
@@ -273,51 +294,51 @@ exports.voteFilm = async (req, res) => {
       }
     }
 
-    // Save the updated film
+    // Save the updated film document
     await film.save();
 
-    // Respond with the updated votes count and whether the user has voted
-    res.json({
-      votes: film.votes.length, // The number of votes is the length of the array
-      userHasVoted: film.votes.includes(userId), // Check if user has voted
+    res.status(200).json({
+      message: 'Vote updated successfully',
+      votes: film.votes.length, // Return the number of upvotes
+      downvotes: film.downvotes.length, // Return the number of downvotes (if needed)
     });
   } catch (err) {
-    console.error('Error voting on film:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error in voteFilm:", err);
+    res.status(500).json({ message: 'An error occurred while processing your vote.' });
   }
 };
-
-
 
 exports.getVotes = async (req, res) => {
   try {
     const { filmId } = req.params;
     const userId = req.user; // Assuming `authMiddleware` attaches the user info to req.user
     
-    // Fetch film details, ensure votes is initialized to an empty array
+    // Fetch film details, ensure votes and downvotes are initialized
     const film = await Film.findById(filmId);
     if (!film) {
       return res.status(404).json({ message: 'Film not found' });
     }
 
-    // Ensure votes field is initialized to an empty array if not present
-    if (!film.votes) {
-      film.votes = [];
-    }
+    // Ensure votes and downvotes fields are initialized to empty arrays if not present
+    film.votes = Array.isArray(film.votes) ? film.votes : [];
+    film.downvotes = Array.isArray(film.downvotes) ? film.downvotes : [];
 
-    // Check if the user has voted
-    const userHasVoted = film.votes.includes(userId); // Adjust based on how you store votes
+    // Check if the user has voted or downvoted
+    const userHasUpvoted = film.votes.includes(userId); // Boolean for upvote status
+    const userHasDownvoted = film.downvotes.includes(userId); // Boolean for downvote status
 
     // Respond with votes count and user's vote status
     res.json({
-      votes: film.votes.length, // Number of votes
-      userHasVoted, // Boolean: whether the user has already upvoted
+      votes: film.votes.length, // Number of upvotes
+      userHasUpvoted, // Boolean: whether the user has already upvoted
+      userHasDownvoted, // Boolean: whether the user has already downvoted
     });
   } catch (err) {
     console.error('Error fetching votes:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 exports.getFeed = async (req, res) => {
   try {
@@ -405,5 +426,52 @@ exports.getFilmsByGenre = async (req, res) => {
   } catch (err) {
     console.error('Error fetching films by genre:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+exports.viewFilm = async (req, res) => {
+  console.log(req.params.filmId)
+  try {
+    const film = await Film.findByIdAndUpdate(
+      req.params.filmId,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
+    if (!film) {
+      return res.status(404).json({ message: 'Film not found' });
+    }
+    res.json(film);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error updating views' });
+  }
+};
+
+exports.getSeriesByFilmId = async (req, res) => {
+  try {
+      const { filmId } = req.params;
+
+      // Find the film by its ID
+      const film = await Film.findById(filmId);
+      if (!film) {
+          return res.status(404).json({ error: 'Film not found' });
+      }
+
+      // Check if the film belongs to a series
+      if (!film.series) {
+          return res.status(200).json({ message: 'This film is not part of a series' });
+      }
+
+      // Find the series by its ID
+      const series = await Series.findById(film.series._id).populate('films'); // Populate the 'films' field if needed
+      if (!series) {
+          return res.status(404).json({ error: 'Series not found' });
+      }
+
+      // Return the series data
+      res.status(200).json(series);
+  } catch (error) {
+      console.error('Error fetching series:', error);
+      res.status(500).json({ error: 'Server error' });
   }
 };

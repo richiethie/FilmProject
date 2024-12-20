@@ -9,7 +9,9 @@ const filmSchema = new mongoose.Schema({
   series: { type: mongoose.Schema.Types.ObjectId, ref: 'Series' },
   duration: { type: Number }, // Duration in minutes
   rank: { type: Number, default: null },
+  views: { type: Number, default: 0 },
   votes: { type: [String], default: [] },
+  downvotes: { type: [String], default: [] },
   visibility: {
     type: String,
     enum: ['private', 'unlisted', 'public'],

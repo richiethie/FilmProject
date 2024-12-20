@@ -7,6 +7,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 import UploadFilmListItemVideo from "./UploadFilmListItemVideo";
 import { Film } from "../types/Film";
 import { Series } from "@/types/Series";
+import { useIsMobile } from "@/context/MobileContext";
 
 interface UploadFilmListProps {
     handleSubmit: (e: React.FormEvent) => void; // Function to handle final submission
@@ -22,6 +23,7 @@ const UploadFilmList = (props: UploadFilmListProps) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { userId, token } = useAuth();
+    const isMobile = useIsMobile();
 
     // Modal state
     const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
@@ -166,7 +168,7 @@ const UploadFilmList = (props: UploadFilmListProps) => {
                         <img
                             src={film.thumbnailUrl}
                             alt={film.title}
-                            className="w-40 aspect-[16/9] rounded-lg object-cover cursor-pointer"
+                            className={`${isMobile ? ("w-32") : ("w-40")} aspect-[16/9] rounded-lg object-cover cursor-pointer`}
                         />
                         <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 cursor-pointer rounded-md">
                             <FaPlay className="text-white text-3xl" />
@@ -174,10 +176,10 @@ const UploadFilmList = (props: UploadFilmListProps) => {
                     </div>
                 </div>
                 <div className="flex-1">
-                    <h3 className="font-bold text-lg">{film.title}</h3>
-                    <p className="text-sm text-gray-400">Genre: {film.genre}</p>
-                    <p className="text-sm text-gray-400">Series: {film.series?.title || "None"}</p>
-                    <p className="text-sm text-gray-400 capitalize">{film.visibility}</p>
+                    <h3 className={`font-bold ${isMobile ? ("text-sm") : ("text-lg")}`}>{film.title}</h3>
+                    <p className={`${isMobile ? ("text-xs") : ("text-sm")} text-gray-400`}>Genre: {film.genre}</p>
+                    <p className={`${isMobile ? ("text-xs") : ("text-sm")} text-gray-400`}>Series: {film.series?.title || "None"}</p>
+                    <p className={`${isMobile ? ("text-xs") : ("text-sm")} text-gray-400 capitalize`}>{film.visibility}</p>
                 </div>
                 <div className="relative">
                     <button

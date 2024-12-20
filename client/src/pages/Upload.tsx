@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import { Film } from '../types/Film';
 import { Series } from '../types/Series';
 import FeedHeader from '@/components/FeedHeader';
+import { useIsMobile } from '@/context/MobileContext';
 
 const Upload = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,6 +35,7 @@ const Upload = () => {
     const [films, setFilms] = useState<Film[]>([]); // New state to store the list of uploaded films
 
     const { userId, username, token } = useAuth();
+    const isMobile = useIsMobile();
 
     useEffect(() => {
 
@@ -200,7 +202,9 @@ const Upload = () => {
                 : undefined, // Explicitly set to undefined if null
                 duration,
                 rank,
+                views: 0,
                 votes: [], // Initialize with an empty array
+                downvotes: [],
                 visibility,
                 uploadedBy: {
                     _id: userId || '', 
@@ -222,16 +226,21 @@ const Upload = () => {
     return (
         <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
             <FeedHeader />
-            <main className="flex-grow container max-w-[60%] mx-auto px-4 py-8">
+            <main className={`flex-grow container ${isMobile ? ("w-full") : ("max-w-[60%]")} mx-auto px-4 py-8`}>
                 <div className='flex justify-between items-center'>
                     <h2 className='text-xl font-semibold'>Creator <span className='text-cornflowerBlue'>Studio</span></h2>
-                    <button
-                        onClick={openModal}
-                        className="bg-cornflowerBlue text-charcoal font-bold py-2 px-4 rounded-md hover:bg-opacity-90 transition"
-                    >
-                        Upload
-                    </button>
+                    {!isMobile &&(
+                        <button
+                            onClick={openModal}
+                            className="bg-cornflowerBlue text-charcoal font-bold py-2 px-4 rounded-md hover:bg-opacity-90 transition"
+                        >
+                            Upload
+                        </button>
+                    )}
                 </div>
+                {isMobile && (
+                    <p className='text-steelGray text-sm mt-2'>Please log in from a Desktop to upload a new film</p>
+                )}
                 
                 {/* Render the list of films */}
                 <UploadFilmList 

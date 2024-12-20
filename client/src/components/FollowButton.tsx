@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from '../context/AuthContext';
+import { useIsMobile } from "@/context/MobileContext";
 
 interface FollowButtonProps {
     targetUserId : string; // ID of the user to follow/unfollow
@@ -12,6 +13,7 @@ const FollowButton = ({ targetUserId , token }: FollowButtonProps) => {
     const [loading, setLoading] = useState(false);
 
     const { userId } = useAuth();
+    const isMobile = useIsMobile();
 
     // Fetch the following state when the component mounts
     useEffect(() => {
@@ -82,12 +84,12 @@ const FollowButton = ({ targetUserId , token }: FollowButtonProps) => {
     return (
         <button
         onClick={toggleFollow}
-        className={`px-4 py-2 rounded-lg ${
+        className={`${isMobile ? ("px-3 py-1 text-sm") : ("px-4 py-2")} rounded-lg ${
             following ? "bg-steelGray hover:bg-gray-600" : "bg-cornflowerBlue hover:bg-blue-600"
         }`}
         disabled={loading} // Disable button while processing
         >
-        {loading ? "Processing..." : following ? "Following" : "Follow"}
+        {loading ? "Following..." : following ? "Following" : "Follow"}
         </button>
     );
 };
