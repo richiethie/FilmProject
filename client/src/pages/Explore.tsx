@@ -4,7 +4,6 @@ import { FaSearch, FaPlay } from 'react-icons/fa';
 import { FiSend } from "react-icons/fi";
 import Footer from '../components/Footer';
 import CategoryPills from '../components/CategoryPills';
-import LeftFeedNav from '../components/LeftFeedNav';
 import FollowButton from '../components/FollowButton';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from "react-router-dom";
