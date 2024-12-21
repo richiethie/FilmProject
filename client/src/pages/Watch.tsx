@@ -23,6 +23,8 @@ import { Collapsible } from "@chakra-ui/react";
 import { BiChevronUp } from 'react-icons/bi';
 import Comment from '@/components/Comment';
 import Vote from '@/components/Vote';
+import VideoPlayer from '@/components/VideoPlayer';
+import Loading from './Loading';
 
 const Watch = () => {
     const { id } = useParams(); // Get the film ID from the route
@@ -183,7 +185,7 @@ const Watch = () => {
     };
 
     if (loading) {
-        return <div className="text-center text-lg text-crispWhite">Loading...</div>;
+        return <Loading />;
     }
 
     if (!film) {
@@ -196,13 +198,7 @@ const Watch = () => {
                 <div className='bg-charcoal'>
                     <div className='sticky top-0 z-50'>
                         <FeedHeader />
-                        <div className="relative aspect-w-16 aspect-h-9 mb-2">
-                            <video
-                                src={film.filmUrl}
-                                controls
-                                className="w-full h-full object-cover shadow-lg sticky"
-                            ></video>
-                        </div>
+                        <VideoPlayer filmUrl={film.filmUrl} thumbnailUrl={film.thumbnailUrl} />
                     </div>
                     <div className='flex flex-col w-full px-4'>
                         <h1 className="text-xl font-bold">{film.title}</h1>
@@ -314,7 +310,7 @@ const Watch = () => {
                             <Collapsible.Root className='w-full bg-darkCharcoal rounded-xl'>
                                 {/* Comments Title */}
                                 <Collapsible.Trigger  onClick={handleCommentTrigger} className='flex flex-col w-full' paddingY="2" paddingX="4">
-                                    <div className='flex w-full justify-between items-center'>
+                                    <div className='flex w-full justify-between items-center py-2'>
                                         <h3 className="text-md font-semibold mb-2 cursor-pointer">
                                             {comments.length} Comments
                                         </h3>
@@ -382,7 +378,7 @@ const Watch = () => {
                                             </div>
                                         ))
                                         ) : (
-                                        <p className="text-gray-400">No comments yet.</p>
+                                        <p className="text-gray-400 text-sm ml-2 my-4">Be the first to comment here.</p>
                                         )}
                                     </div>
                                 </Collapsible.Content>
