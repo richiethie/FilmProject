@@ -8,6 +8,7 @@ const filmRoutes = require('./routes/film');
 const notificationRoutes = require('./routes/notificationRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const seriesRoutes = require('./routes/seriesRoutes');
+const searchRoutes = require('./routes/searchRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -35,6 +36,7 @@ app.use('/api/films', filmRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/series', seriesRoutes);
+app.use('/api/search', searchRoutes);
 
 // Start the server
 app.listen(PORT, () => {
