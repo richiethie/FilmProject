@@ -72,6 +72,13 @@ const Watch = () => {
         setDrawerHeight(totalHeight);
     };
 
+    useEffect(() => {
+        calculateTotalHeight(); // Call this on component mount or resize
+        window.addEventListener('resize', calculateTotalHeight);
+        console.log("Resize")
+        return () => window.removeEventListener('resize', calculateTotalHeight);
+    }, []);
+
     // Fetch the current film data
     useEffect(() => {
         const fetchFilm = async () => {
