@@ -67,7 +67,8 @@ const Watch = () => {
     const calculateTotalHeight = () => {
         const headerHeight = headerRef.current?.offsetHeight || 0;
         const videoHeight = videoRef.current?.offsetHeight || 0;
-        const totalHeight = headerHeight + videoHeight;
+        const addressBarHeight = 56; // Common height of the address bar
+        const totalHeight = headerHeight + videoHeight + addressBarHeight; // Subtract address bar height
         setDrawerHeight(totalHeight);
     };
 
@@ -381,7 +382,7 @@ const Watch = () => {
                                                     value={newComment}
                                                     onChange={(e) => setNewComment(e.target.value)}
                                                     placeholder="Add a comment..."
-                                                    className="p-3 text-crispWhite w-[85%] text-xs border border-steelGray rounded-lg shadow-inner resize-none"
+                                                    className="p-3 text-crispWhite w-[85%] text-xs border border-steelGray rounded-lg shadow-inner resize-none focus:outline-none focus:ring-0 touch-manipulation appearance-none"
                                                     onClick={handleCommenting}
                                                     rows={rows}
                                                 />
