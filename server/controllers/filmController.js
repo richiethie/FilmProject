@@ -79,6 +79,11 @@ exports.uploadFilm = async (req, res) => {
     // Save the film entry to the database
     await newFilm.save();
 
+    // Find the user and update their uploadedFilmsCount
+    await User.findByIdAndUpdate(uploadedBy, {
+      $inc: { uploadedFilmsCount: 1 }, // Increment uploadedFilmsCount
+    });
+
     // If a series was linked or created, update its films array
     if (seriesId) {
       await Series.findByIdAndUpdate(seriesId, {
@@ -406,6 +411,66 @@ exports.getTopTenFilms = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch top films' });
   }
 };
+
+exports.getTopTenFilmsByGenre = async (req, res) => {
+  try {
+    const topFilmsByGenre = await Film.aggregate([
+      // Ensure all films have a genre
+      { $match: { genre: { $exists: true, $ne: null } } },
+
+      // Add a field to calculate the number of votes
+      {
+        $addFields: {
+          voteCount: { $size: "$votes" },
+        },
+      },
+
+      // Sort all films by voteCount in descending order
+      {
+        $sort: { genre: 1, voteCount: -1 }, // Sort by genre and then by voteCount
+      },
+
+      // Group films by genre
+      {
+        $group: {
+          _id: "$genre",
+          topFilms: { $push: "$$ROOT" }, // Push all films into an array for each genre
+        },
+      },
+
+      // Slice top 10 films for each genre
+      {
+        $project: {
+          genre: "$_id",
+          topFilms: { $slice: ["$topFilms", 10] }, // Take the top 10 films per genre
+        },
+      },
+    ]);
+    
+    const topFilms = topFilmsByGenre.map(genre => genre.topFilms);
+    
+    const populatedTopFilmsByGenre = await Film.populate(topFilms, {
+      path: "uploadedBy",
+      select: "username",
+    });
+
+    topFilmsByGenre.forEach((genre, index) => {
+      genre.topFilms = populatedTopFilmsByGenre[index]; // Replace with populated films
+    });
+
+    // Sort genres alphabetically
+    topFilmsByGenre.sort((a, b) => a.genre.localeCompare(b.genre));
+    
+    console.log(topFilmsByGenre);
+
+    
+    res.json(topFilmsByGenre);
+  } catch (error) {
+    console.error("Error fetching top films by genre:", error);
+    res.status(500).json({ error: "Failed to fetch top films by genre" });
+  }
+};
+
 
 exports.getFilmsByGenre = async (req, res) => {
   try {

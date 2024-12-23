@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useLayoutEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -25,6 +25,18 @@ import Comment from '@/components/Comment';
 import Vote from '@/components/Vote';
 import VideoPlayer from '@/components/VideoPlayer';
 import Loading from './Loading';
+import {
+    DrawerActionTrigger,
+    DrawerBackdrop,
+    DrawerBody,
+    DrawerCloseTrigger,
+    DrawerContent,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerRoot,
+    DrawerTitle,
+    DrawerTrigger,
+  } from "@/components/ui/drawer"
 
 const Watch = () => {
     const { id } = useParams(); // Get the film ID from the route
@@ -41,11 +53,23 @@ const Watch = () => {
     const [rows, setRows] = useState<number>(1);
     const [buttonVisibility, setButtonVisibility] = useState<boolean>(false);
 
+    const videoRef = useRef<HTMLDivElement | null>(null);
+    const headerRef = useRef<HTMLDivElement | null>(null);
+    const [videoHeight, setVideoHeight] = useState<number>(0);
+    const [drawerHeight, setDrawerHeight] = useState<number>(0);
+
     const hasIncremented = useRef(false);
 
     const { token, username, userId } = useAuth();
     const navigate = useNavigate();
     const isMobile = useIsMobile();
+
+    const calculateTotalHeight = () => {
+        const headerHeight = headerRef.current?.offsetHeight || 0;
+        const videoHeight = videoRef.current?.offsetHeight || 0;
+        const totalHeight = headerHeight + videoHeight;
+        setDrawerHeight(totalHeight);
+    };
 
     // Fetch the current film data
     useEffect(() => {
@@ -197,8 +221,12 @@ const Watch = () => {
             {isMobile ? (
                 <div className='bg-charcoal'>
                     <div className='sticky top-0 z-50'>
-                        <FeedHeader />
-                        <VideoPlayer filmUrl={film.filmUrl} thumbnailUrl={film.thumbnailUrl} />
+                        <div ref={headerRef}>
+                            <FeedHeader />
+                        </div>
+                        <div ref={videoRef}>
+                            <VideoPlayer filmUrl={film.filmUrl} thumbnailUrl={film.thumbnailUrl} videoHeight={videoHeight}/>
+                        </div>
                     </div>
                     <div className='flex flex-col w-full px-4'>
                         <h1 className="text-xl font-bold">{film.title}</h1>
@@ -307,32 +335,39 @@ const Watch = () => {
                         )}
                         {/* Comments Section */}
                         <div className="w-full bg-charcoal border-t border-b border-steelGray py-4 overflow-hidden mb-4">
-                            <Collapsible.Root className='w-full bg-darkCharcoal rounded-xl'>
-                                {/* Comments Title */}
-                                <Collapsible.Trigger  onClick={handleCommentTrigger} className='flex flex-col w-full' paddingY="2" paddingX="4">
-                                    <div className='flex w-full justify-between items-center py-2'>
-                                        <h3 className="text-md font-semibold mb-2 cursor-pointer">
-                                            {comments.length} Comments
-                                        </h3>
-                                        {isCommentsOpen && (
-                                            <button className='pl-4'>
-                                                <BiChevronUp className='text-crispWhite text-2xl font-bold' />
-                                            </button>
-                                        )}
+                            <DrawerRoot placement="bottom" >
+                                 <DrawerTrigger onClick={calculateTotalHeight} className='w-full'> {/* onClick={setIsCommentsOpen} */}
+                                    <div className='w-full bg-darkCharcoal rounded-xl p-4'>
+                                        <div className='flex flex-col w-full' onClick={handleCommentTrigger}>
+                                            <div className='flex w-full justify-between items-center py-2'>
+                                                <h3 className="text-md font-semibold mb-1 cursor-pointer">
+                                                    {comments.length} Comments
+                                                </h3>
+                                                {isCommentsOpen && (
+                                                    <button className='pl-4'>
+                                                        <BiChevronUp className='text-crispWhite text-2xl font-bold' />
+                                                    </button>
+                                                )}
+                                            </div>
+                                            {!isCommentsOpen && (
+                                                <p className='text-steelGray text-start text-sm pb-2'>
+                                                    {comments.length > 0 && comments[0]?.text
+                                                        ? getFirstWords(comments[0].text)
+                                                        : "No comments yet."}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div>
-                                        {!isCommentsOpen && (
-                                            <p className='text-steelGray text-sm pb-2'>
-                                                {comments.length > 0 && comments[0]?.text 
-                                                    ? getFirstWords(comments[0].text) 
-                                                    : "No comments yet."}
-                                            </p>
-                                        )}
-                                    </div>
-                                </Collapsible.Trigger>
-                                <Collapsible.Content className='overflow-y-auto max-h-96'>
-                                    <div className="rounded-lg">
-                                        {/* Comment Form */}
+                                </DrawerTrigger>
+
+                                 <DrawerContent 
+                                    style={{
+                                        height: `calc(100vh - ${drawerHeight}px)`, // Adjust height dynamically
+                                        overflowY: "auto", // Enable scroll if content overflows
+                                        }}
+                                 >
+                                    <DrawerHeader>Comments</DrawerHeader>
+                                    <DrawerBody>
                                         <form onSubmit={handleCommentSubmit} className="mb-2 flex flex-col border-t border-b border-steelGray py-4">
                                             <div className='flex justify-between px-2'>
                                                 <div className="w-10 h-10">
@@ -353,7 +388,7 @@ const Watch = () => {
                                             </div>
                                             {buttonVisibility && (
                                                 <div className='flex justify-end mt-2 mr-2'>
-                                                    <button type='reset' onClick={handleCancelComment} className='text-white text-xs mr-2'>Cancel</button>
+                                                    <button onClick={handleCancelComment} onMouseDown={(e) => e.preventDefault()} className='text-white text-xs mr-2'>Cancel</button>
                                                     <button
                                                         type="submit"
                                                         className="py-2 px-2 bg-cornflowerBlue text-white text-xs rounded-xl hover:bg-blue-600 transition"
@@ -363,26 +398,31 @@ const Watch = () => {
                                                 </div>
                                             )}
                                         </form>
+
                                         {comments.length > 0 ? (
-                                        comments.map((comment) => (
-                                            <div key={comment._id} className="p-4 mt-0">
-                                                <div className="flex items-center">
-                                                    <p className="text-sm text-crispWhite font-semibold mr-2">
-                                                        <ProfileLink username={comment.user.username} userId={comment.user._id} />
-                                                    </p>
-                                                    <p className="text-xs text-gray-400">
-                                                        {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-                                                    </p>
+                                            comments.map((comment) => (
+                                                <div key={comment._id} className="p-4 mt-0">
+                                                    <div className="flex items-center">
+                                                        <p className="text-sm text-crispWhite font-semibold mr-2">
+                                                            <ProfileLink username={comment.user.username} userId={comment.user._id} />
+                                                        </p>
+                                                        <p className="text-xs text-gray-400">
+                                                            {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                                                        </p>
+                                                    </div>
+                                                    <p className="text-sm">{comment.text}</p>
                                                 </div>
-                                                <p className="text-sm">{comment.text}</p>
-                                            </div>
-                                        ))
+                                            ))
                                         ) : (
-                                        <p className="text-gray-400 text-sm ml-2 my-4">Be the first to comment here.</p>
+                                            <p className="text-gray-400 text-sm ml-2 my-4">Be the first to comment here.</p>
                                         )}
-                                    </div>
-                                </Collapsible.Content>
-                            </Collapsible.Root>
+                                    </DrawerBody>
+
+                                    <DrawerFooter>
+                                        <DrawerCloseTrigger>Close</DrawerCloseTrigger>
+                                    </DrawerFooter>
+                                </DrawerContent>
+                            </DrawerRoot>
                         </div>
                     </div>
                     {/* Other Films from that Genre */}
@@ -405,8 +445,9 @@ const Watch = () => {
                                         <div className="flex-grow py-2">
                                             <div className="flex justify-between px-2 items-center">
                                                 <div>
-                                                    <h3 className="text-xl font-bold">{otherFilm.title}</h3>
-                                                    <p className="text-sm text-gray-400"><ProfileLink username={otherFilm.uploadedBy.username} userId={otherFilm.uploadedBy._id} /> • {formatDistanceToNow(new Date(otherFilm.createdAt), { addSuffix: true })}</p>
+                                                    <h3 className="text-lg font-bold">{otherFilm.title}</h3>
+                                                    <p className='text-sm'><ProfileLink username={otherFilm.uploadedBy.username} userId={otherFilm.uploadedBy._id} /></p>
+                                                    <p className="text-sm text-gray-400">{otherFilm.views} views • {formatDistanceToNow(new Date(otherFilm.createdAt), { addSuffix: true })}</p>
                                                 </div>
                                                 <div className="flex space-x-2 items-center">
                                                     <Vote filmId={otherFilm._id} />

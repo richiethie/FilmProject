@@ -10,6 +10,7 @@ import Astronaut from '../../assets/img/profilePic/profile-astronaut.jpg'
 import Comment from '@/components/Comment';
 import Vote from '@/components/Vote';
 import { formatDistanceToNow } from 'date-fns';
+import { IoFilter } from "react-icons/io5";
 
 const SearchPage = () => {
   const navigate = useNavigate();
@@ -65,16 +66,28 @@ const SearchPage = () => {
           className="border-steelGray px-4 mb-4"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              (e.target as HTMLInputElement).blur(); // Dismiss the keyboard
+            }
+          }}
         />
+        <button
+          // onClick={() => navigate(-1)}
+          className="text-white text-2xl pl-4 hover:text-cornflowerBlue mb-4 flex items-center"
+          aria-label="Go Back"
+        >
+          <IoFilter />
+        </button>
       </div>
       
       {/* Display Search Results */}
       {results.users.length > 0 && (
-        <div className='px-4'>
-          <h3 className="text-lg font-semibold">Users</h3>
-          <ul className='border-t border-steelGray mt-4'>
-            {results.users.map((user) => (
-              <div key={user._id} className="bg-charcoal rounded-lg overflow-hidden py-4">
+        <div className=''>
+          <h3 className="text-lg font-semibold pl-4">Users</h3>
+          <ul className='border-t border-b border-steelGray my-4'>
+            {results.users.filter(user => user.role).map((user) => (
+              <div key={user._id} className="bg-charcoal rounded-lg overflow-hidden py-4 px-4">
                 <div className="flex justify-between items-center">
                   <div className='flex'>
                     <img src={user.profilePhotoUrl || Astronaut} alt={user.username} className="w-12 h-12 rounded-full object-cover mr-4" />
@@ -99,7 +112,7 @@ const SearchPage = () => {
       {results.films.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold pl-4">Films</h3>
-          <ul className='border-t border-steelGray mt-4'>
+          <ul className='border-t border-b border-steelGray my-4'>
             {results.films.map((film) => (
               <div key={film._id} className="bg-charcoal overflow-hidden mt-4 group">
                 <div
@@ -133,11 +146,11 @@ const SearchPage = () => {
         </div>
       )}
       {results.series.length > 0 && (
-        <div className='px-4'>
-          <h3 className="text-lg font-semibold">Series</h3>
+        <div className=''>
+          <h3 className="text-lg font-semibold pl-4">Series</h3>
           <ul className='border-t border-steelGray mt-4'>
             {results.series.map((series) => (
-              <div className='flex justify-between items-center gap-2 py-4 px-4 mb-4 mt-2 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl'>
+              <div className='flex justify-between items-center gap-2 py-4 px-4 mx-4 mb-4 mt-4 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl'>
                 <div className='w-24 h-16 overflow-hidden rounded-md cursor-pointer group'>
                     <img
                         src={series?.films[0]?.thumbnailUrl}

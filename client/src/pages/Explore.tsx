@@ -17,6 +17,7 @@ import TopTenFilms from '../components/TopTenFilms';
 import FeedHeader from '@/components/FeedHeader';
 import { useIsMobile } from '@/context/MobileContext';
 import { formatDistanceToNow } from 'date-fns';
+import Astronaut from '../assets/img/profilePic/profile-astronaut.jpg'
 
 const Explore = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -86,23 +87,7 @@ const Explore = () => {
     return (
         <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
             <FeedHeader />
-            <main className={`flex-grow container ${isMobile ? ("w-full") : ("max-w-[80%]")} mx-auto py-8`}>
-                {/* INPUT */}
-                <div className="flex justify-center items-center px-4 mb-6">
-                    <div className="flex flex-grow items-center bg-charcoal max-w-[600px] h-12">
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            className="rounded-l-md bg-charcoal border border-steelGray shadow-inner shadow-secondary py-2 px-4 text-lg w-full focus:border-cornflowerBlue outline-none h-[100%]"
-                        />
-                        <button className="py-2 px-4 rounded-r-md border border-steelGray hover:border-cornflowerBlue border-l-0 flex-shrink-0 bg-charcoal h-[100%]">
-                            <FaSearch className="text-steelGray text-lg" />
-                        </button>
-                    </div>
-                </div>
-
+            <main className={`flex-grow container ${isMobile ? ("w-full") : ("max-w-[80%]")} mx-auto py-2`}>
                 {/* Toggle View Mode */}
                 <div className="flex justify-center mb-4">
                     <button
@@ -135,7 +120,7 @@ const Explore = () => {
                     ) : viewMode === 'films' ? (
                         <>
                             <TopTenFilms />
-                            <h1 className="text-4xl font-bold mb-6">Your Feed</h1>
+                            <h1 className={`font-bold mb-6 ${isMobile ? ("ml-2 text-xl") : ("text-4xl")}`}>Your Feed</h1>
                             <div 
                                 className={`${!isMobile && ("grid gap-6")}`}
                                 style={{
@@ -208,23 +193,31 @@ const Explore = () => {
                             </div>
                         </>
                     ) : (
-                        <>
-                            <h1 className="text-4xl font-bold mb-6">Recommended Users</h1>
+                        <div>
+                            <h1 className={`font-bold mb-6 ${isMobile ? ("ml-2 text-xl") : ("text-4xl")}`}>Recommended Users</h1>
                             <div className="grid gap-6 grid-cols-1">
                                 {filteredUsers?.map((user, index) => (
-                                    <div key={index} className="bg-charcoal rounded-lg overflow-hidden p-4">
-                                        <div className="flex items-center">
-                                            <img src={user.profilePhotoUrl} alt={user.username} className="w-12 h-12 rounded-full object-cover mr-4" />
-                                            <div className='mb-2 text-xl'>
-                                                <ProfileLink username={user.username} userId={user._id} />
-                                                <p className="text-sm text-gray-400">{user.bio}</p>
+                                    <div key={user._id} className="bg-charcoal rounded-lg overflow-hidden py-4 px-4">
+                                        <div className="flex justify-between items-center">
+                                            <div className='flex'>
+                                                <img src={user.profilePhotoUrl || Astronaut} alt={user.username} className="w-12 h-12 rounded-full object-cover mr-4" />
+                                                <div className='mb-2 text-xl'>
+                                                    <div className='text-sm'>
+                                                    <ProfileLink username={user.username} userId={user._id} />
+                                                    </div>
+                                                    {user.bio && (
+                                                    <p className="text-xs text-gray-400">{user.followersCount} followers • {user.uploadedFilmsCount} films</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className='ml-4'>
+                                                <FollowButton targetUserId={user._id || ''} token={token || ''} />
                                             </div>
                                         </div>
-                                        <FollowButton targetUserId={user._id || ''} token={token || ''} />
                                     </div>
                                 ))}
                             </div>
-                        </>
+                        </div>
                     )}
                 </section>
             </main>

@@ -37,18 +37,19 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return; // Prevent form submission
     }
-
+  
     setLoading(true);
     setError(null);
-
+  
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
+      // Step 1: Hit the signup route
+      const signupResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,23 +60,44 @@ const Signup = () => {
           password: formData.password,
         }),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || 'An error occurred. Please try again.');
-      } else {
-        // Log in the user after signup
-        login(data); // Call login with the received user data
-        navigate('/feed'); // Redirect to feed
+  
+      const signupData = await signupResponse.json();
+  
+      if (!signupResponse.ok) {
+        setError(signupData.message || 'An error occurred during signup. Please try again.');
+        return;
       }
+  
+      // Step 2: Hit the login route with the same credentials
+      const loginResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password,
+        }),
+      });
+  
+      const loginData = await loginResponse.json();
+  
+      if (!loginResponse.ok) {
+        setError(loginData.message || 'An error occurred during login. Please try again.');
+        return;
+      }
+  
+      // Step 3: Log in the user
+      login({ token: loginData.token, user: loginData.user }); // Update context with login data
+      navigate('/feed'); // Redirect to feed
     } catch (err) {
       setError('An error occurred. Please try again later.');
-      console.log(err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <section className="flex flex-col h-screen py-20 bg-steelGray relative overflow-hidden">
