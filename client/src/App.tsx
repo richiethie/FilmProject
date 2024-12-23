@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import WatchTopTenFilm from "./pages/WatchTopTenFilm";
 import SearchPage from "./pages/mobile/SearchPage";
 import EditProfile from "./pages/mobile/EditProfile";
+import Trending from "./pages/Trending";
 
 function App() {
   return (
@@ -78,6 +79,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <SearchPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/trending"
+              element={
+                <ProtectedRoute>
+                  <Trending />
                 </ProtectedRoute>
               }
             />

@@ -8,7 +8,7 @@ import { FaPlay } from "react-icons/fa";
 import { MdDoNotDisturb, MdModeEdit } from "react-icons/md";
 import { useAuth } from '../context/AuthContext';
 import EditProfileModal from '../components/EditProfileModal';
-import stockProfilePic from "../assets/img/profilePic/stock-profile-pic.webp";
+import stockProfilePic from "../assets/img/profilePic/profile-astronaut.jpg";
 import ProfileFilmModal from '../components/ProfileFilmModal';
 import { User } from '../types/User';
 import { Film } from '../types/Film';
@@ -325,105 +325,113 @@ const Profile = () => {
 
           {/* Series Tab */}
           <Tabs.Content value="series">
-        <div className="text-center">
-          {selectedSeries ? (
-            /* Render films from the selected series */
-            <div>
-              <button
-                className="flex items-center mt-6 py-2 px-4 bg-charcoal text-crispWhite font-semibold rounded-lg hover:bg-darkCharcoal transition-all"
-                onClick={() => setSelectedSeries(null)}
-              >
-                <FaArrowLeftLong className='mr-2' />
-                Back to Series
-              </button>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
-                {selectedSeries.films.map((film, index) => (
-                  <div
-                    key={index}
-                    className="bg-charcoal rounded-lg overflow-hidden relative group"
-                    onClick={() => navigate(`/films/${film._id}`)}
-                  >
-                    <div className="relative w-full pb-[56.25%] cursor-pointer">
-                      <img
-                        src={film.thumbnailUrl}
-                        alt={film.title}
-                        className={`${
-                          film.rank && 'border-4 border-cornflowerBlue'
-                        } absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg`}
-                      />
-                      {film.rank && (
-                        <div className="absolute top-3 left-4 text-cornflowerBlue">
-                          <IoMdTrendingUp className="text-3xl" />
-                        </div>
-                      )}
-                      <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <FaPlay className="text-white text-4xl" />
-                      </div>
-                    </div>
-                    <div className="p-1">
-                      <h3 className="text-lg font-bold">{film.title}</h3>
-                      <p className="text-sm text-gray-400">{film.description}</p>
-                    </div>
-                  </div>
-                ))}
-
-              </div>
-            </div>
-          ) : (
-            /* Render the list of series */
-            seriesList?.map((series, index) => (
-              <div key={index}>
-                {isMobile ? (
-                  <div onClick={() => setSelectedSeries(series)} className='flex justify-between items-center gap-2 py-4 px-4 mb-4 mt-2 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl'>
-                    <div className='w-24 h-16 overflow-hidden rounded-md cursor-pointer group'>
-                        <img
-                            src={series?.films[0]?.thumbnailUrl}
-                            alt={series?.films[0]?.title || 'Film thumbnail'}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                    </div>
-                    <div className="flex items-center">
-                        <p
-                            className="text-md font-semibold text-center truncate max-w-xs mr-2"
-                            title={series?.title}
+            <div className="text-center">
+                {selectedSeries ? (
+                    /* Render films from the selected series */
+                    <div>
+                        <button
+                            className="flex items-center mt-6 py-2 px-4 bg-charcoal text-crispWhite font-semibold rounded-lg hover:bg-darkCharcoal transition-all"
+                            onClick={() => setSelectedSeries(null)}
                         >
-                            {series?.title}
-                        </p>
-                        <p className="text-md bg-charcoal p-2 rounded-xl font-semibold text-center truncate max-w-xs">
-                            {series?.films.length} films
-                        </p>
+                            <FaArrowLeftLong className='mr-2' />
+                            Back to Series
+                        </button>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
+                            {selectedSeries.films.map((film, index) => (
+                                <div
+                                    key={index}
+                                    className="bg-charcoal rounded-lg overflow-hidden relative group"
+                                    onClick={() => navigate(`/films/${film._id}`)}
+                                >
+                                    <div className="relative w-full pb-[56.25%] cursor-pointer">
+                                        <img
+                                            src={film.thumbnailUrl}
+                                            alt={film.title}
+                                            className={`${
+                                                film.rank && 'border-4 border-cornflowerBlue'
+                                            } absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg`}
+                                        />
+                                        {film.rank && (
+                                            <div className="absolute top-3 left-4 text-cornflowerBlue">
+                                                <IoMdTrendingUp className="text-3xl" />
+                                            </div>
+                                        )}
+                                        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                            <FaPlay className="text-white text-4xl" />
+                                        </div>
+                                    </div>
+                                    <div className="p-1">
+                                        <h3 className="text-lg font-bold">{film.title}</h3>
+                                        <p className="text-sm text-gray-400">{film.description}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                  </div>
                 ) : (
-                  <div
-                    className="flex justify-between items-center gap-2 py-4 px-16 my-8 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl"
-                    onClick={() => setSelectedSeries(series)}
-                  >
-                    <div className="w-48 h-32 overflow-hidden rounded-md cursor-pointer group">
-                      <img
-                        src={series.films[0]?.thumbnailUrl}
-                        alt={series.films[0]?.title || 'Film thumbnail'}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <p
-                        className="text-lg font-semibold text-center truncate max-w-xs"
-                        title={series.title}
-                      >
-                        {series.title}
-                      </p>
-                      <p className="text-lg bg-charcoal p-2 rounded-xl font-semibold text-center truncate max-w-xs">
-                        {series.films.length} films
-                      </p>
-                    </div>
-                  </div>
+                    /* Render the list of series */
+                    seriesList && seriesList?.length > 0 ? (
+                        seriesList.map((series, index) => (
+                            <div key={index}>
+                                {isMobile ? (
+                                    <div onClick={() => setSelectedSeries(series)} className='flex justify-between items-center gap-2 py-4 px-4 mb-4 mt-2 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl'>
+                                        <div className='w-24 h-16 overflow-hidden rounded-md cursor-pointer group'>
+                                            <img
+                                                src={series?.films[0]?.thumbnailUrl}
+                                                alt={series?.films[0]?.title || 'Film thumbnail'}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        </div>
+                                        <div className="flex items-center">
+                                            <p
+                                                className="text-md font-semibold text-center truncate max-w-xs mr-2"
+                                                title={series?.title}
+                                            >
+                                                {series?.title}
+                                            </p>
+                                            <p className="text-md bg-charcoal p-2 rounded-xl font-semibold text-center truncate max-w-xs">
+                                                {series?.films?.length} films
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div
+                                        className="flex justify-between items-center gap-2 py-4 px-16 my-8 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl"
+                                        onClick={() => setSelectedSeries(series)}
+                                    >
+                                        <div className="w-48 h-32 overflow-hidden rounded-md cursor-pointer group">
+                                            <img
+                                                src={series?.films[0]?.thumbnailUrl}
+                                                alt={series?.films[0]?.title || 'Film thumbnail'}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <p
+                                                className="text-lg font-semibold text-center truncate max-w-xs"
+                                                title={series?.title}
+                                            >
+                                                {series?.title}
+                                            </p>
+                                            <p className="text-lg bg-charcoal p-2 rounded-xl font-semibold text-center truncate max-w-xs">
+                                                {series?.films?.length} films
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        /* Display message when there are no series */
+                        <div className='flex flex-col items-center justify-center mt-16'>
+                          <MdDoNotDisturb className='text-5xl text-steelGray mb-4'/>
+                          <p className='text-steelGray font-bold'>No series available</p>
+                      </div>
+                    )
                 )}
-              </div>
-            ))
-          )}
-        </div>
-      </Tabs.Content>
+            </div>
+          </Tabs.Content>
+
 
           {/* Premieres Tab */}
           <Tabs.Content value="premiere">

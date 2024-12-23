@@ -8,7 +8,7 @@ import { useIsMobile } from '@/context/MobileContext';
 import { Film } from '../types/Film';
 import { FaPlay } from 'react-icons/fa';
 import { FiSend } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom'; // Assuming you use react-router for navigation
+import { Link, useNavigate } from 'react-router-dom'; // Assuming you use react-router for navigation
 import Vote from '../components/Vote';
 import ProfileLink from '../components/ProfileLink';
 import Comment from '../components/Comment';
@@ -20,6 +20,7 @@ import {
   SkeletonCircle,
   SkeletonText,
 } from "@/components/ui/skeleton"
+import { IoSearch } from 'react-icons/io5';
 
 const Feed = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -85,9 +86,23 @@ const Feed = () => {
                                     ))}
                                 </div>
                             ) : error ? (
-                                <p>{error}</p>
+                                <div className='flex flex-col justify-center items-center mt-12'>
+                                    <p>Nothing in your Feed yet!</p>
+                                    <p>Find users to follow to populate your feed</p>
+                                    <Link to="/login" className="flex items-center bg-cornflowerBlue hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2 mt-4">
+                                        <IoSearch className='text-2xl'/>
+                                        <span className='font-semibold ml-2'>Explore</span>
+                                    </Link>
+                                </div>
                             ) : filteredFilms.length === 0 ? (
-                                <p>No films found.</p>
+                                <div className='flex flex-col justify-center items-center mt-12'>
+                                    <p>Nothing in your Feed yet!</p>
+                                    <p>Find users to follow to populate your feed</p>
+                                    <Link to="/explore" className="flex items-center bg-cornflowerBlue hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2 mt-4">
+                                        <IoSearch className='text-2xl'/>
+                                        <span className='font-semibold ml-2'>Explore</span>
+                                    </Link>
+                                </div>
                             ) : (
                                 <div
                                     style={{
@@ -167,7 +182,14 @@ const Feed = () => {
                             ) : error ? (
                                 <p>{error}</p>
                             ) : filteredFilms.length === 0 ? (
-                                <p>No films found.</p>
+                                <div className='flex flex-col justify-center items-center mt-24'>
+                                    <p>Nothing in your Feed yet!</p>
+                                    <p>Find users to follow to populate your feed</p>
+                                    <Link to="/explore" className="flex items-center bg-cornflowerBlue hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2 mt-4">
+                                        <IoSearch className='text-2xl'/>
+                                        <span className='font-semibold ml-2'>Explore</span>
+                                    </Link>
+                                </div>
                             ) : (
                                 <div
                                     className="grid gap-6"

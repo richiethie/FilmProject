@@ -25,7 +25,7 @@ const TopTenFilms = () => {
 
     return (
         <section className="my-12">
-            <h2 className="text-4xl font-bold mb-6">Top 10 Films</h2>
+            <h2 className={` font-bold mb-6 ${isMobile ? ("ml-2 text-xl") : ("text-4xl")}`}>Top 10 Films</h2>
             {loading ? (
                 <p className="text-center">Loading top films...</p>
             ) : (

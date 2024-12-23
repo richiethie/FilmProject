@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useIsMobile } from '@/context/MobileContext';
 import { User } from '@/types/User';
 import axios from 'axios';
-import stockProfilePic from "../assets/img/profilePic/stock-profile-pic.webp";
+import stockProfilePic from "../assets/img/profilePic/profile-astronaut.jpg";
 import { GoHomeFill } from 'react-icons/go';
 import { IoNotifications, IoSearch, IoNotificationsOutline, IoTrendingUp, IoPulseSharp, IoSettingsSharp, IoBookmark, IoSearchOutline } from 'react-icons/io5';
 import { PiFilmSlate } from "react-icons/pi";
@@ -108,39 +108,39 @@ const FeedHeader = () => {
                                 </ul>
                                 <ul className='space-y-4 border-b border-steelGray pb-4 mt-4'>
                                     <li className='text-xl font-semibold ml-2'>Trending</li>
-                                    <Link to="/explore" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
+                                    <Link to="/trending" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
                                         <IoTrendingUp className='text-2xl'/>
                                         <li  className='font-semibold ml-4'>Top 10 Films</li>
                                     </Link>
-                                    <Link to="/explore" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
+                                    <Link to="/trending#action" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
                                         <PiFilmSlate className='text-2xl'/>
                                         <li  className='font-semibold ml-4'>Top 10 Action</li>
                                     </Link>
-                                    <Link to="/explore" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
+                                    <Link to="/trending#comedy" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
                                         <FaFaceLaughBeam className='text-2xl'/>
                                         <li  className='font-semibold ml-4'>Top 10 Comedy</li>
                                     </Link>
-                                    <Link to="/explore" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
+                                    <Link to="/trending#drama" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
                                         <MdOutlineTheaterComedy className='text-2xl'/>
                                         <li  className='font-semibold ml-4'>Top 10 Drama</li>
                                     </Link>
-                                    <Link to="/explore" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
+                                    <Link to="/trending#fantasy" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
                                         <FaWandMagicSparkles className='text-2xl'/>
                                         <li  className='font-semibold ml-4'>Top 10 Fantasy</li>
                                     </Link>
-                                    <Link to="/explore" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
+                                    <Link to="/trending#horror" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
                                         <RiGhost2Line className='text-2xl'/>
                                         <li  className='font-semibold ml-4'>Top 10 Horror</li>
                                     </Link>
-                                    <Link to="/explore" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
+                                    <Link to="/trending#mystery" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
                                         <IoSearch className='text-2xl'/>
                                         <li  className='font-semibold ml-4'>Top 10 Mystery</li>
                                     </Link>
-                                    <Link to="/explore" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
+                                    <Link to="/trending#romance" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
                                         <BsHearts className='text-2xl'/>
                                         <li  className='font-semibold ml-4'>Top 10 Romance</li>
                                     </Link>
-                                    <Link to="/explore" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
+                                    <Link to="/trending#thriller" onClick={() => setSelected(!selected)} className="flex items-center hover:text-cornflowerBlue hover:bg-darkCharcoal rounded-lg p-2">
                                         <IoPulseSharp className='text-2xl'/>
                                         <li  className='font-semibold ml-4'>Top 10 Thriller</li>
                                     </Link>

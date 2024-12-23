@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import stockProfilePic from "../../assets/img/profilePic/stock-profile-pic.webp"
+import stockProfilePic from "../../assets/img/profilePic/profile-astronaut.jpg"
 import { User } from "../../types/User";
 import { Film } from "../../types/Film";
 import { Button } from "@/components/ui/button"
@@ -145,19 +145,18 @@ const EditProfile = () => {
 
                 {/* Profile Image Upload */}
                 <div className="mb-4 flex flex-col w-full h-full">
-                    <div className="h-full flex items-center justify-between bg-darkCharcoal rounded-xl py-4 px-4 mb-4">
+                    <div className="h-full flex items-center justify-between bg-darkCharcoal rounded-xl py-4 px-8 mb-4">
                         <div className="flex items-center">
-                            <div className="flex items-center">
+                            <div className="flex items-center flex-shrink-0">
                                 <img
                                 src={updatedProfile.profilePhotoUrl || user?.profilePhotoUrl || stockProfilePic}
                                 alt="Profile"
                                 className="w-20 h-20 rounded-full object-cover mr-2"
                                 />
                             </div>
-                            <label className="font-semibold text-md">{user?.username}</label>
                         </div>
                         {/* Custom file input button */}
-                        <div>
+                        <div className="flex justify-center items-end">
                             <input
                                 type="file"
                                 accept="image/*"
@@ -165,8 +164,8 @@ const EditProfile = () => {
                                 className="hidden"
                                 id="file-upload"
                             />
-                            <label htmlFor="file-upload" className="bg-cornflowerBlue text-white text-xs px-4 py-2 rounded-lg cursor-pointer">
-                                Choose New Image
+                            <label htmlFor="file-upload" className="bg-cornflowerBlue text-white text-center text-xs px-2 py-2 rounded-lg cursor-pointer">
+                                Choose Image
                             </label>
                         </div>
                     </div>
@@ -259,6 +258,7 @@ const EditProfile = () => {
 
                     <button
                         className="text-gray-600 text-xs px-4 py-2"
+                        onClick={() => navigate(`/profile/${loggedInUserId}`)}
                     >
                         Cancel
                     </button>

@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { FaEllipsisV, FaPlay, FaLayerGroup } from "react-icons/fa";
-import { MdDeleteOutline, MdEdit } from "react-icons/md";
+import { MdDeleteOutline, MdDoNotDisturb, MdEdit } from "react-icons/md";
 import { FaCalendarAlt } from "react-icons/fa";
 import UploadFilmListItemVideo from "./UploadFilmListItemVideo";
 import { Film } from "../types/Film";
 import { Series } from "@/types/Series";
 import { useIsMobile } from "@/context/MobileContext";
+import Loading from "@/pages/Loading";
 
 interface UploadFilmListProps {
     handleSubmit: (e: React.FormEvent) => void; // Function to handle final submission
@@ -153,8 +154,13 @@ const UploadFilmList = (props: UploadFilmListProps) => {
         }
     };
 
-    if (loading) return <p>Loading films...</p>;
-    if (error) return <p>Error: {error}</p>;
+    if (loading) return <Loading />;
+    if (error) return (
+        <div className='flex flex-col items-center justify-center mt-16'>
+            <MdDoNotDisturb className='text-5xl text-steelGray mb-4'/>
+            <p className='text-steelGray font-bold'>No films available</p>
+        </div>
+    );
 
     return (
         <div className="mt-8">
