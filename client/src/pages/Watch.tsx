@@ -68,7 +68,7 @@ const Watch = () => {
         const headerHeight = headerRef.current?.offsetHeight || 0;
         const videoHeight = videoRef.current?.offsetHeight || 0;
         const addressBarHeight = 56; // Common height of the address bar
-        const totalHeight = headerHeight + videoHeight + addressBarHeight; // Subtract address bar height
+        const totalHeight = headerHeight + videoHeight; // Subtract address bar height
         setDrawerHeight(totalHeight);
     };
 
@@ -363,7 +363,7 @@ const Watch = () => {
 
                                  <DrawerContent 
                                     style={{
-                                        height: `calc(100vh - ${drawerHeight}px)`, // Adjust height dynamically
+                                        height: `calc(100% - ${drawerHeight}px)`, // Adjust height dynamically
                                         overflowY: "auto", // Enable scroll if content overflows
                                         }}
                                  >
