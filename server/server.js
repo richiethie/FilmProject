@@ -41,7 +41,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/series', seriesRoutes);
 app.use('/api/search', searchRoutes);
 
-cron.schedule('0 0 * * 0', updateTopCreator, {
+cron.schedule('20 6 * * 2', updateTopCreator, {
   scheduled: true,
   timezone: 'UTC', // Set the desired timezone if necessary
 });
