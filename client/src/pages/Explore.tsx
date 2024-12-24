@@ -18,11 +18,13 @@ import FeedHeader from '@/components/FeedHeader';
 import { useIsMobile } from '@/context/MobileContext';
 import { formatDistanceToNow } from 'date-fns';
 import Astronaut from '../assets/img/profilePic/profile-astronaut.jpg'
+import { Tabs } from '@chakra-ui/react';
+import Loading from './Loading';
 
 const Explore = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [viewMode, setViewMode] = useState<'films' | 'users'>('films');
+    const [viewMode, setViewMode] = useState<'films' | 'users' | 'series'>('films');
     const [films, setFilms] = useState<Film[] | null>(null);
     const [filteredFilms, setFilteredFilms] = useState<Film[] | null>(null);
     const [users, setUsers] = useState<User[] | null>(null);
@@ -51,74 +53,56 @@ const Explore = () => {
 
     // Fetch Films from the backend
     useEffect(() => {
-        if (viewMode === 'films') {
-            setLoading(true);
-            axios.get(`${import.meta.env.VITE_API_URL}/api/films`)
-                .then((response) => {
-                    setFilms(response.data);
-                    setFilteredFilms(response.data);
-                })
-                .catch((error) => console.error('Error fetching films:', error))
-                .finally(() => setLoading(false));
-        }
-    }, [viewMode]);
+        setLoading(true);
+        axios.get(`${import.meta.env.VITE_API_URL}/api/films`)
+            .then((response) => {
+                setFilms(response.data);
+                setFilteredFilms(response.data);
+            })
+            .catch((error) => console.error('Error fetching films:', error))
+            .finally(() => setLoading(false));
+    }, []);
 
     // Fetch Users from the backend
     useEffect(() => {
-        if (viewMode === 'users') {
-            setLoading(true);
-            axios.get(`${import.meta.env.VITE_API_URL}/api/users`, {
-                headers: { Authorization: `Bearer ${token}` },
+        setLoading(true);
+        axios.get(`${import.meta.env.VITE_API_URL}/api/users`, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+            .then((response) => {
+                setUsers(response.data);
+                setFilteredUsers(response.data);
             })
-                .then((response) => {
-                    setUsers(response.data);
-                    setFilteredUsers(response.data);
-                })
-                .catch((error) => console.error('Error fetching users:', error))
-                .finally(() => setLoading(false));
-        }
-    }, [viewMode]);
+            .catch((error) => console.error('Error fetching users:', error))
+            .finally(() => setLoading(false));
+    }, []);
 
     // Filter results whenever searchQuery, selectedCategory, or viewMode changes
     useEffect(() => {
         filterFilms();
     }, [searchQuery, selectedCategory, viewMode, films]);
 
+    if (loading) {
+        return <Loading />;
+    }
+
     return (
         <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
             <FeedHeader />
             <main className={`flex-grow container ${isMobile ? ("w-full") : ("max-w-[80%]")} mx-auto py-2`}>
                 {/* Toggle View Mode */}
-                <div className="flex justify-center mb-4">
-                    <button
-                        onClick={() => setViewMode('films')}
-                        className={`px-4 py-2 rounded-l-md ${viewMode === 'films' ? 'bg-cornflowerBlue text-white' : 'bg-charcoal border border-steelGray hover:border-cornflowerBlue'}`}
-                    >
-                        Films
-                    </button>
-                    <button
-                        onClick={() => setViewMode('users')}
-                        className={`px-4 py-2 rounded-r-md ${viewMode === 'users' ? 'bg-cornflowerBlue text-white' : 'bg-charcoal border border-steelGray hover:border-cornflowerBlue'}`}
-                    >
-                        Users
-                    </button>
-                </div>
+                <Tabs.Root lazyMount unmountOnExit defaultValue="films">
+                    <Tabs.List className='mb-2'>
+                        <Tabs.Trigger className='p-4' value="films">Films</Tabs.Trigger>
+                        <Tabs.Trigger className='p-4' value="users">Users</Tabs.Trigger>
+                        <Tabs.Trigger className='p-4' value="series">Series</Tabs.Trigger>
+                    </Tabs.List>
 
-                {/* Category Pills */}
-                {viewMode === 'films' && (
-                    <div className='flex justify-center'>
-                        <CategoryPills categories={categories} selectedCategory={selectedCategory} onSelect={setSelectedCategory} />
-                    </div>
-                )}
-
-                
-
-                {/* Content Section */}
-                <section className="mb-12 mt-8">
-                    {loading ? (
-                        <p className="text-center">Loading...</p>
-                    ) : viewMode === 'films' ? (
+                    <Tabs.Content value='films'>
                         <>
+                            <div className='flex justify-center'>
+                                <CategoryPills categories={categories} selectedCategory={selectedCategory} onSelect={setSelectedCategory} />
+                            </div>
                             <TopTenFilms />
                             <h1 className={`font-bold mb-6 ${isMobile ? ("ml-2 text-xl") : ("text-4xl")}`}>Your Feed</h1>
                             <div 
@@ -128,8 +112,8 @@ const Explore = () => {
                                     maxWidth: '100%',
                                 }}
                             >
-                                {filteredFilms?.map((film) => (
-                                    <>
+                                {filteredFilms?.map((film, index) => (
+                                    <div key={index} >
                                         {isMobile ? (
                                             <div key={film._id} className="bg-charcoal overflow-hidden mt-4 group">
                                                 <div
@@ -146,14 +130,14 @@ const Explore = () => {
                                                     <div className="flex justify-between px-2 items-center">
                                                         <div>
                                                             <h3 className="text-lg font-bold">{film.title}</h3>
-                                                            <p className="text-xs text-gray-400"><ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} /> • {formatDistanceToNow(new Date(film.createdAt), { addSuffix: true })}</p>
+                                                            <div className='text-sm'>
+                                                                <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} />
+                                                            </div>
+                                                            <p className="text-xs text-gray-400">{film.views} views • {formatDistanceToNow(new Date(film.createdAt), { addSuffix: true })}</p>
                                                         </div>
                                                         <div className="flex space-x-2 items-center">
                                                             <Vote filmId={film._id} />
                                                             <Comment filmId={film._id} />
-                                                            {/* <button className="text-crispWhite border border-steelGray px-3 py-1 rounded-full hover:text-cornflowerBlue">
-                                                                <FiSend className="text-xl" />
-                                                            </button> */}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -175,7 +159,7 @@ const Explore = () => {
                                                     <div className="flex justify-between items-center">
                                                         <div>
                                                             <h3 className="text-xl font-bold">{film.title}</h3>
-                                                            <p className="text-sm text-gray-400">by <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} /></p>
+                                                            <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} />
                                                         </div>
                                                         <div className="flex space-x-4 items-center">
                                                             <Vote filmId={film._id} />
@@ -188,38 +172,66 @@ const Explore = () => {
                                                 </div>
                                             </div>
                                         )}
-                                    </>
+                                    </div>
                                 ))}
                             </div>
                         </>
-                    ) : (
+                    </Tabs.Content>
+
+                    <Tabs.Content value='users'>
                         <div>
                             <h1 className={`font-bold mb-6 ${isMobile ? ("ml-2 text-xl") : ("text-4xl")}`}>Recommended Users</h1>
                             <div className="grid gap-6 grid-cols-1">
                                 {filteredUsers?.map((user, index) => (
-                                    <div key={user._id} className="bg-charcoal rounded-lg overflow-hidden py-4 px-4">
-                                        <div className="flex justify-between items-center">
-                                            <div className='flex'>
-                                                <img src={user.profilePhotoUrl || Astronaut} alt={user.username} className="w-12 h-12 rounded-full object-cover mr-4" />
-                                                <div className='mb-2 text-xl'>
-                                                    <div className='text-sm'>
-                                                    <ProfileLink username={user.username} userId={user._id} />
+                                    <div key={user._id} className={`bg-charcoal rounded-lg overflow-hidden ${user.topCreator === false ? ("py-4 px-4") : ("px-2")}`}>
+                                        {user.topCreator === true ? (
+                                            <div className='bg-darkCharcoal px-2 py-2 rounded-lg'>
+                                                <div className="flex justify-between items-center">
+                                                    <div className='flex items-center'>
+                                                        <img src={user.profilePhotoUrl || Astronaut} alt={user.username} className="w-16 h-16 rounded-full border border-fireOrange object-cover mr-4" />
+                                                        <div className='mb-2 text-xl'>
+                                                            <div className='text-sm'>
+                                                                <ProfileLink username={user.username} userId={user._id} />
+                                                            </div>
+                                                            <p className="text-xs text-gray-400">{user.followersCount} followers • {user.uploadedFilmsCount} films</p>
+                                                        </div>
                                                     </div>
-                                                    {user.bio && (
-                                                    <p className="text-xs text-gray-400">{user.followersCount} followers • {user.uploadedFilmsCount} films</p>
-                                                    )}
+                                                </div>
+                                                <div>
+                                                    <p className='text-xs text-center mt-2 mb-4 bg-charcoal p-2 rounded-lg'>{user.bio || "This user may not have a bio, but they are still a top creator"}</p>
+                                                </div>
+                                                <div className='flex justify-center items-center my-2'>
+                                                    <FollowButton targetUserId={user._id || ''} token={token || ''} />
+                                                    <button className='bg-darkFireOrange px-3 py-1 ml-8 rounded-lg text-sm'>Achievements</button>
                                                 </div>
                                             </div>
-                                            <div className='ml-4'>
-                                                <FollowButton targetUserId={user._id || ''} token={token || ''} />
+                                        ) : (
+                                            <div className="flex justify-between items-center">
+                                                <div className='flex items-center'>
+                                                    <img src={user.profilePhotoUrl || Astronaut} alt={user.username} className="w-12 h-12 rounded-full object-cover mr-4" />
+                                                    <div className='mb-2 text-xl'>
+                                                        <div className='text-sm'>
+                                                            <ProfileLink username={user.username} userId={user._id} />
+                                                        </div>
+                                                        <p className="text-xs text-gray-400">{user.followersCount} followers • {user.uploadedFilmsCount} films</p>
+                                                    </div>
+                                                </div>
+                                                <div className='ml-4'>
+                                                    <FollowButton targetUserId={user._id || ''} token={token || ''} />
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
                         </div>
-                    )}
-                </section>
+                    </Tabs.Content>
+                    <Tabs.Content value='series'>
+                        <div>
+                            <p className='text-center'>Nothing here yet</p>
+                        </div>
+                    </Tabs.Content>
+                </Tabs.Root>
             </main>
             <Footer />
         </div>

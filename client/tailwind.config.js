@@ -16,6 +16,8 @@ export default {
         crispWhite: '#f9f9f9',
         mintGreen: '#77f2a1',
         steelGray: '#A3ABB5',
+        fireOrange: '#FF4500',
+        darkFireOrange: '#B23300',
         transparent: 'rgba(0, 0, 0, 0)',
       },
     },
