@@ -126,14 +126,14 @@ const Feed = () => {
                                                 <div className="flex justify-between px-2 items-center">
                                                     <div>
                                                         <h3 className="text-xl font-bold">{film.title}</h3>
-                                                        <p className="text-sm text-gray-400"><ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} /> • {formatDistanceToNow(new Date(film.createdAt), { addSuffix: true })}</p>
+                                                        <div className='text-sm'>
+                                                            <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} />
+                                                        </div>
+                                                        <p className="text-xs text-gray-400">{film.views || 0} views • {formatDistanceToNow(new Date(film.createdAt), { addSuffix: true })}</p>
                                                     </div>
                                                     <div className="flex space-x-2 items-center">
                                                         <Vote filmId={film._id} />
                                                         <Comment filmId={film._id} />
-                                                        {/* <button className="text-crispWhite border border-steelGray px-3 py-1 rounded-full hover:text-cornflowerBlue">
-                                                            <FiSend className="text-xl" />
-                                                        </button> */}
                                                     </div>
                                                 </div>
                                             </div>

@@ -14,6 +14,7 @@ import stockProfilePic from "../assets/img/profilePic/stock-profile-pic.webp";
 import Footer from '../components/Footer';
 import FeedHeader from '@/components/FeedHeader';
 import { IoBookmarkOutline } from "react-icons/io5";
+import { HiFire } from "react-icons/hi";
 import VoteWithBG from '@/components/VoteWithBG';
 import { Series } from '@/types/Series';
 import { FaPlay } from 'react-icons/fa';
@@ -141,7 +142,7 @@ const Watch = () => {
                     axios.get(`${apiBaseUrl}/api/films/genre/${film.genre}`),
                     axios.get(`${apiBaseUrl}/api/users/${film.uploadedBy._id}`)
                 ]);
-
+                console.log(userResponse.data);
                 setOtherFilms(otherFilmsResponse.data);
                 setUser(userResponse.data);
             } catch (error) {
@@ -351,19 +352,12 @@ const Watch = () => {
                                                 <h3 className="text-md font-semibold mb-1 cursor-pointer">
                                                     {comments.length} Comments
                                                 </h3>
-                                                {isCommentsOpen && (
-                                                    <button className='pl-4'>
-                                                        <BiChevronUp className='text-crispWhite text-2xl font-bold' />
-                                                    </button>
-                                                )}
                                             </div>
-                                            {!isCommentsOpen && (
-                                                <p className='text-steelGray text-start text-sm pb-2'>
-                                                    {comments.length > 0 && comments[0]?.text
-                                                        ? getFirstWords(comments[0].text)
-                                                        : "No comments yet."}
-                                                </p>
-                                            )}
+                                            <p className='text-steelGray text-start text-sm pb-2'>
+                                                {comments.length > 0 && comments[0]?.text
+                                                    ? getFirstWords(comments[0].text)
+                                                    : "No comments yet."}
+                                            </p>
                                         </div>
                                     </div>
                                 </DrawerTrigger>

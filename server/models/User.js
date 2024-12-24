@@ -56,6 +56,7 @@ const userSchema = new mongoose.Schema({
     darkMode: { type: Boolean, default: false },
     notifications: { type: Boolean, default: true },
   },
+  topCreator: { type: Boolean, default: false },
   uploadedFilmsCount: {
     type: Number,
     default: 0,

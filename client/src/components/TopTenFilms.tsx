@@ -93,7 +93,7 @@ const TopTenFilms = () => {
                                         <h3 className="text-xl font-bold text-crispWhite">{film.title}</h3>
                                         <p className="text-sm text-gray-300">Votes: {film.votes.length}</p>
                                         <p className="text-sm text-gray-400">
-                                            by <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} />
+                                            <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} />
                                         </p>
                                     </div>
                                 </div>

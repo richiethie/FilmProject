@@ -20,6 +20,7 @@ export interface User {
       darkMode: boolean;
       notifications: boolean;
     };
+    topCreator?: boolean;
     uploadedFilmsCount: number;
     createdAt: Date;
 }

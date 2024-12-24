@@ -9,6 +9,7 @@ import { FaPlay } from "react-icons/fa";
 import ProfileLink from "@/components/ProfileLink";
 import FeedHeader from "@/components/FeedHeader";
 import Footer from "@/components/Footer";
+import { BiUpvote } from "react-icons/bi";
 
 const Trending = () => {
     const [topFilmsByGenre, setTopFilmsByGenre] = useState<
@@ -103,16 +104,16 @@ const Trending = () => {
                                     <h3 className="text-xl font-bold text-crispWhite">
                                         {film.title}
                                     </h3>
-                                    <p className="text-sm text-gray-300">
-                                        Votes: {film.votes.length}
-                                    </p>
-                                    <p className="text-sm text-gray-400">
-                                        by{" "}
+                                    <div className="flex justify-between items-center w-[260px]">
                                         <ProfileLink
                                             username={film.uploadedBy.username}
                                             userId={film.uploadedBy._id}
                                         />
-                                    </p>
+                                        <div className="flex items-center">
+                                            <BiUpvote className="text-xl mr-1"/>
+                                            <p >{film.votes.length}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -157,16 +158,16 @@ const Trending = () => {
                                             <h3 className="text-xl font-bold text-crispWhite">
                                                 {film.title}
                                             </h3>
-                                            <p className="text-sm text-gray-300">
-                                                Votes: {film.votes.length}
-                                            </p>
-                                            <p className="text-sm text-gray-400">
-                                                by{" "}
+                                            <div className="flex justify-between items-center w-[260px]">
                                                 <ProfileLink
                                                     username={film.uploadedBy.username}
                                                     userId={film.uploadedBy._id}
                                                 />
-                                            </p>
+                                                <div className="flex items-center">
+                                                    <BiUpvote className="text-xl mr-1"/>
+                                                    <p >{film.votes.length}</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

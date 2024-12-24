@@ -10,6 +10,9 @@ const commentRoutes = require('./routes/commentRoutes');
 const seriesRoutes = require('./routes/seriesRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 
+const cron = require('node-cron');
+const { updateTopCreator } = require('./utils/updateTopCreator');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -37,6 +40,11 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/series', seriesRoutes);
 app.use('/api/search', searchRoutes);
+
+cron.schedule('0 0 * * 0', updateTopCreator, {
+  scheduled: true,
+  timezone: 'UTC', // Set the desired timezone if necessary
+});
 
 // Start the server
 app.listen(PORT, () => {
