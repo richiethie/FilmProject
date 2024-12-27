@@ -42,14 +42,14 @@ const ProfileLink = ({ username, userId }: ProfileLinkProps) => {
         <div className='flex items-center'>
             <Link
                 to={`/profile/${userId}`} // Adjust the route as per your app's structure
-                className={`${user?.topCreator === true ? ("text-fireOrange") : ("text-cornflowerBlue")} font-bold hover:text-crispWhite z-10`}
+                className={`${user?.topCreator === true ? ("text-cornflowerBlue") : ("text-cornflowerBlue")} font-bold hover:text-crispWhite z-10`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {username} 
             </Link>
             {user?.topCreator === true && (
                 <Tooltip content="Top Creator">
-                    <HiFire className=' ml-1 bg-darkCharcoal p-1 rounded-full text-2xl text-fireOrange'/>
+                    <HiFire className=' ml-1 bg-darkCharcoal p-1 rounded-full text-xl text-fireOrange'/>
                 </Tooltip>
             )}
         </div>

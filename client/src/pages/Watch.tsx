@@ -255,9 +255,9 @@ const Watch = () => {
                                     />
                                 </div>
                                 <div>
-                                    <p className="text-md text-gray-400">
+                                    <div className="text-md text-gray-400">
                                         <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id}/>
-                                    </p>
+                                    </div>
                                     <p className='text-sm text-gray-400'>{user?.followersCount || user?.followers.length} followers </p>
                                 </div>
                             </div>
@@ -405,9 +405,9 @@ const Watch = () => {
                                             comments.map((comment) => (
                                                 <div key={comment._id} className="p-4 mt-0">
                                                     <div className="flex items-center">
-                                                        <p className="text-sm text-crispWhite font-semibold mr-2">
+                                                        <div className="text-sm text-crispWhite font-semibold mr-2">
                                                             <ProfileLink username={comment.user.username} userId={comment.user._id} />
-                                                        </p>
+                                                        </div>
                                                         <p className="text-xs text-gray-400">
                                                             {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                                                         </p>
@@ -448,7 +448,7 @@ const Watch = () => {
                                             <div className="flex justify-between px-2 items-center">
                                                 <div>
                                                     <h3 className="text-lg font-bold">{otherFilm.title}</h3>
-                                                    <p className='text-sm'><ProfileLink username={otherFilm.uploadedBy.username} userId={otherFilm.uploadedBy._id} /></p>
+                                                    <div className='text-sm'><ProfileLink username={otherFilm.uploadedBy.username} userId={otherFilm.uploadedBy._id} /></div>
                                                     <p className="text-sm text-gray-400">{otherFilm.views} views • {formatDistanceToNow(new Date(otherFilm.createdAt), { addSuffix: true })}</p>
                                                 </div>
                                                 <div className="flex space-x-2 items-center">
@@ -495,9 +495,9 @@ const Watch = () => {
                                             />
                                         </div>
                                         <div>
-                                            <p className="text-md text-gray-400">
+                                            <div className="text-md text-gray-400">
                                                 <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id}/>
-                                            </p>
+                                            </div>
                                             <p className='text-sm text-gray-400'>{user?.followersCount || user?.followers.length} followers - {formatDistanceToNow(new Date(film.createdAt), { addSuffix: true })}</p>
                                         </div>
                                         <div className='h-4 ml-4 mt-1'>
@@ -525,7 +525,7 @@ const Watch = () => {
                             {/* Film Details */}
                             <div className="bg-darkCharcoal rounded-lg p-6 shadow-inner shadow-secondary mt-4 mb-8">
                                 <h2 className="text-2xl font-bold mb-4">Description</h2>
-                                <p className="text-lg">{film.description || 'No description provided.'}</p>
+                                <p className="text-md">{film.description || 'No description provided.'}</p>
                                 <p className='text-md text-steelGray'>Uploaded on {format(new Date(film.createdAt), 'MMMM d, yyyy')}</p>
         
                                 <h3 className="text-xl font-semibold mt-6 mb-2">Genre</h3>
