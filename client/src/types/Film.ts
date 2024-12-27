@@ -9,7 +9,7 @@ export interface Film {
         _id: string;
         title: string;
     }
-    duration?: number;
+    duration: number;
     rank: number | null;
     views: number;
     visibility: 'private' | 'unlisted' | 'public';

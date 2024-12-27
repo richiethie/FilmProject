@@ -6,6 +6,10 @@ const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
 const { createNotification } = require('../utils/notifications');
 const Notification = require('../models/Notification');
+const ffmpeg = require('fluent-ffmpeg');
+
+
+ffmpeg.setFfmpegPath('C:\\ffmpeg-2024-12-26-git-fe04b93afa-full_build\\bin\\ffmpeg.exe');
 
 // Initialize AWS S3
 const s3 = new AWS.S3({
@@ -70,7 +74,7 @@ exports.uploadFilm = async (req, res) => {
       filmUrl,          // S3 URL of the uploaded film
       thumbnailUrl,     // Thumbnail URL
       visibility,       // Visibility setting
-      duration,         // Duration in minutes
+      duration,         // Duration in seconds
       rank: rank || 0,  // Rank, if provided
       votes,            // Votes, if provided
       uploadedBy,       // User who uploaded the film
@@ -90,6 +94,21 @@ exports.uploadFilm = async (req, res) => {
         $push: { films: newFilm._id }, // Add the film to the series
       });
     }
+
+    // Extract and update the duration of the uploaded film
+    ffmpeg.ffprobe(filmUrl, (err, metadata) => {
+      if (err) {
+        console.error(`Error reading video metadata for film "${title}":`, err);
+        return;
+      }
+
+      const duration = metadata.format.duration; // Duration in seconds
+      console.log(`Updating duration for ${title}: ${duration} seconds`);
+
+      Film.findByIdAndUpdate(newFilm._id, { duration }, { new: true })
+        .then(() => console.log(`Updated film "${title}" with duration ${duration} seconds`))
+        .catch((err) => console.error('Error saving film duration:', err));
+    });
 
     // Return the newly created film
     res.status(201).json({

@@ -19,9 +19,9 @@ const FilmDetails = ({ film }: FilmDetailProps) => {
     <Collapsible.Root className="bg-darkCharcoal my-4 rounded-xl px-4 pb-2">
       <Collapsible.Trigger onClick={() => setIsOpen(!isOpen)} paddingY="3" className="w-ful">
         <div className="flex flex-col items-start text-start">
-            <h2 className="text-xl font-bold mb-2">Description</h2>
+            <h2 className="text-lg font-bold mb-2">Description</h2>
             {!isOpen && (
-                <p className="text-md text-steelGray">
+                <p className="text-sm text-steelGray">
                     {getFirstWords(film.description || "No description provided.")}
                     <span className="text-crispWhite text-xs"> see more</span>
                 </p>
@@ -30,7 +30,7 @@ const FilmDetails = ({ film }: FilmDetailProps) => {
       </Collapsible.Trigger>
       <Collapsible.Content>
         <div className="flex flex-col">
-          <p className="text-md">{film.description || "No description provided."}</p>
+          <p className="text-sm">{film.description || "No description provided."}</p>
           <p className="text-sm text-steelGray">Uploaded on {format(new Date(film.createdAt), "MMMM d, yyyy")}</p>
 
           <h3 className="text-lg mt-2">Genre</h3>
