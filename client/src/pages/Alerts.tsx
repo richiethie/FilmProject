@@ -52,7 +52,7 @@ const Alerts = () => {
                         You have no notifications at the moment.
                     </p>
                 ) : (
-                    <div className={`${isMobile ? ("w-full") : ("max-w-[50%] space-y-6")} mx-auto `}>
+                    <div className={`${isMobile ? ("w-full") : ("max-w-[80%] space-y-6")} mx-auto `}>
                       {alerts.map((alert) => (
                         <div
                           key={alert._id}
@@ -71,9 +71,9 @@ const Alerts = () => {
                             />
                           </div>
                           <div className="flex-grow">
-                            <p className={`${isMobile ? ("text-sm") : ("text-lg")} font-semibold`}>
+                            <div className={`${isMobile ? ("text-sm") : ("text-lg")} font-semibold flex items-center`}>
                               <ProfileLink username={alert.initiator.username} userId={alert.initiator._id}/>{' '}
-                              <span className={`${isMobile ? ("text-xs") : ("text-sm")} text-crispWhite font-normal`}>
+                              <span className={`${isMobile ? ("text-xs") : ("text-sm")} text-crispWhite font-normal ml-2`}>
                                 {alert.type === 'Vote' && (
                                   <>
                                     voted on <strong className="font-bold">{alert.film?.title}</strong>
@@ -86,7 +86,7 @@ const Alerts = () => {
                                   </>
                                 )}
                               </span>
-                            </p>
+                            </div>
                             {alert.type === 'Comment' && alert.commentText && (
                               <div className='bg-[#1a2128] my-1 rounded-lg'>
                                 <p className={`${isMobile ? ("text-xs") : ("text-sm")} text-steelGray py-2 px-2`}>{getFirstWords(alert.commentText)}</p>
@@ -100,7 +100,7 @@ const Alerts = () => {
                             <img
                               src={alert.film?.thumbnailUrl || '/default-thumbnail.png'} // Fallback URL
                               alt="Film Thumbnail"
-                              className={`${isMobile ? ("w-24") : ("w-32")} aspect-[16/9] rounded-lg object-cover ml-4`}
+                              className={`${isMobile ? ("w-24") : ("w-40")} aspect-[16/9] rounded-lg object-cover ml-4`}
                             />
                           ) : (
                             <FollowButton targetUserId={alert.initiator._id || ''} token={token || ''} />

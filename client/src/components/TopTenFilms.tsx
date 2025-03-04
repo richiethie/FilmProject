@@ -8,6 +8,7 @@ import { Navigation, Pagination } from 'swiper/modules';
 import '../styles/swiperStyles.css';
 import ProfileLink from './ProfileLink';
 import { useIsMobile } from '@/context/MobileContext';
+import { BiUpvote } from 'react-icons/bi';
 
 const TopTenFilms = () => {
     const [topFilms, setTopFilms] = useState<Film[] | null>(null);
@@ -57,7 +58,7 @@ const TopTenFilms = () => {
                         breakpoints={{
                             640: { slidesPerView: 1 },
                             768: { slidesPerView: 2 },
-                            1024: { slidesPerView: 4 },
+                            1024: { slidesPerView: 5 },
                         }}
                         className="h-auto"
                     >
@@ -76,7 +77,7 @@ const TopTenFilms = () => {
                                     <img
                                         src={film.thumbnailUrl}
                                         alt={film.title}
-                                        className={`w-full  object-cover ${isMobile ? ("h-[260px]") : ("rounded-lg h-[300px]")}`}
+                                        className={`w-full  object-cover ${isMobile ? ("h-[260px]") : ("rounded-lg h-[240px]")}`}
                                     />
     
                                     {/* Play Button Overlay */}
@@ -89,12 +90,18 @@ const TopTenFilms = () => {
                                     )}
     
                                     {/* Text at Bottom Left */}
-                                    <div className="absolute bottom-4 left-4 z-30">
+                                    <div className="absolute bottom-4 left-4 z-30 w-full">
                                         <h3 className="text-xl font-bold text-crispWhite">{film.title}</h3>
-                                        <p className="text-sm text-gray-300">Votes: {film.votes.length}</p>
-                                        <p className="text-sm text-gray-400">
-                                            <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} />
-                                        </p>
+                                        <div className={`flex justify-between items-center`}>
+                                            <ProfileLink
+                                                username={film.uploadedBy.username}
+                                                userId={film.uploadedBy._id}
+                                            />
+                                            <div className="flex items-center mr-8">
+                                                <BiUpvote className="text-xl mr-1"/>
+                                                <p >{film.votes.length}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </SwiperSlide>

@@ -85,7 +85,7 @@ const Trending = () => {
                                 onClick={() => navigate(`/films/${film._id}`)}
                             >
                                 {/* Rank Number */}
-                                <span className="absolute top-2 left-2 text-[80px] font-extrabold text-gray-800 opacity-60 z-30 drop-shadow-lg leading-none pointer-events-none text-outline-white">
+                                <span className="absolute top-2 left-2 text-[80px] font-extrabold text-gray-800 opacity-60 z-30 drop-shadow-lg leading-none pointer-events-none text-outline-white font-family-poppins">
                                     {index + 1}
                                 </span>
 

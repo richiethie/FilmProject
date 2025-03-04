@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { uploadFilm, getFilms, getUserFilms, uploadToS3, uploadThumbnailToS3, deleteFilm, getFilmById, voteFilm, getVotes, getFeed, getTopTenFilms, getTopTenFilmsByGenre, getFilmsByGenre, viewFilm, getSeriesByFilmId } = require('../controllers/filmController');
+const { uploadFilm, getFilms, getUserFilms, uploadToS3, uploadThumbnailToS3, deleteFilm, getFilmById, voteFilm, getVotes, getFeed, getTopTenFilms, getTopTenFilmsByGenre, getFilmsByGenre, viewFilm, getSeriesByFilmId, updateFilm } = require('../controllers/filmController');
 const auth = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
@@ -16,6 +16,7 @@ router.get('/:id', getFilmById);
 router.get('/genre/:genre', getFilmsByGenre);
 router.get('/user/:userId', getUserFilms);
 router.delete('/delete/:filmId', auth, deleteFilm);
+router.put('/update/:filmId', updateFilm);
 router.post('/:filmId/vote', auth, voteFilm);
 router.get('/:filmId/votes', auth, getVotes);
 router.put('/:filmId/view', viewFilm);

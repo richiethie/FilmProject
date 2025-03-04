@@ -18,6 +18,8 @@ import WatchTopTenFilm from "./pages/WatchTopTenFilm";
 import SearchPage from "./pages/mobile/SearchPage";
 import EditProfile from "./pages/mobile/EditProfile";
 import Trending from "./pages/Trending";
+import Series from "./pages/Series";
+import EditFilm from "./pages/EditFilm";
 
 function App() {
   return (
@@ -103,6 +105,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Watch />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/series/:seriesId"
+              element={
+                <ProtectedRoute>
+                  <Series />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-film/:filmId"
+              element={
+                <ProtectedRoute>
+                  <EditFilm />
                 </ProtectedRoute>
               }
             />

@@ -38,7 +38,7 @@ exports.getUserSeries = async (req, res) => {
     const { userId } = req.params;
     try {
         const series = await Series.find({ createdBy: userId })
-            .populate('films', 'title genre thumbnailUrl') // Populate film details
+            .populate('films', 'title genre thumbnailUrl description') // Populate film details
             .exec();
 
         if (!series) {
@@ -55,7 +55,10 @@ exports.getUserSeries = async (req, res) => {
 exports.getSeriesById = async (req, res) => {
     const { seriesId } = req.params;
     try {
-        const series = await Series.findById(seriesId);
+        const series = await Series.findById(seriesId)
+            .populate('films', 'title genre thumbnailUrl description')
+            .populate('createdBy', 'username _id')
+            .exec();
         if (!series) {
             return res.status(404).json({ message: 'No series found for this user' });
         }

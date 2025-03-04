@@ -22,7 +22,7 @@ const Hero = () => {
                 <div className="text-center text-crispWhite px-4">
                     <h3 className={`my-2 ${isMobile ? ("text-md") : ("text-xl")} font-semibold drop-shadow-md text-cornflowerBlue`}>Join a vibrant community of filmmakers!</h3> {/* Subtitle */}
                     <h1 className={`${isMobile ? ("text-xl") : ("text-5xl")} font-black drop-shadow-md`}>Share Your Stories in Minutes</h1> {/* Main heading */}
-                    <p className={`${isMobile ? ("text-sm mb-4 mt-2") : ("mt-6 text-lg")} drop-shadow-md`}>Connect with a community of filmmakers and showcase your short films. Whether you're a seasoned pro or a passionate newcomer, we provide the platform you need.</p> {/* Additional description */}
+                    <p className={`${isMobile ? ("text-sm mb-4 mt-2") : ("my-6 text-lg")} drop-shadow-md`}>Connect with a community of filmmakers and showcase your short films. Whether you're a seasoned pro or a passionate newcomer, we provide the platform you need.</p> {/* Additional description */}
                     <Link to="/signup" className={`bg-cornflowerBlue hover:bg-steelGray ${isMobile ? ("px-3 py-1 text-sm") : ("px-4 py-2")} rounded`}>
                         Get Started
                     </Link>

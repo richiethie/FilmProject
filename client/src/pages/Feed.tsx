@@ -253,7 +253,7 @@ const Feed = () => {
             ) : (
                 <>
                     <FeedHeader />
-                    <main className="flex-grow container max-w-[80%] mx-auto px-4 py-8">
+                    <main className="flex-grow container max-w-[95%] mx-auto px-4 py-8">
                         {/* Category Pills */}
                         <div className="flex justify-center mb-6">
                             <CategoryPills
@@ -299,7 +299,7 @@ const Feed = () => {
                                 <div
                                     className="grid gap-6"
                                     style={{
-                                        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+                                        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
                                         maxWidth: '100%',
                                     }}
                                 >
@@ -309,27 +309,47 @@ const Feed = () => {
                                                 className="relative w-full pb-[60%] cursor-pointer"
                                                 onClick={() => navigate(`/films/${film._id}`)}
                                             >
-                                                <img
-                                                    src={film.thumbnailUrl}
-                                                    alt={film.title}
-                                                    className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg"
-                                                />
-                                                <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                                    <FaPlay className="text-crispWhite text-4xl" />
-                                                </div>
+                                                {activeVideo === film._id ? (
+                                                    <video
+                                                        src={film.filmUrl}
+                                                        muted
+                                                        loop
+                                                        className="absolute top-0 left-0 w-full h-full object-cover rounded-lg video"
+                                                        autoPlay={activeVideo === film._id}
+                                                        playsInline
+                                                        onMouseLeave={() => setActiveVideo('')}
+                                                    />
+                                                ) : (
+                                                    <img
+                                                        src={film.thumbnailUrl}
+                                                        alt={film.title}
+                                                        className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg"
+                                                        onMouseEnter={() => setActiveVideo(film._id)}
+                                                    />
+                                                )}
+                                                {activeVideo === film._id && remainingTime !== null ? (
+                                                    <div className="duration-overlay absolute bottom-1 right-1 bg-black bg-opacity-60 px-1 rounded-lg">
+                                                        <span className="text-white text-xs">{formatDuration(remainingTime)}</span>
+                                                    </div>
+                                                ): (
+                                                    <div className="duration-overlay absolute bottom-1 right-1 bg-black bg-opacity-60 px-1 rounded-lg">
+                                                        <span className="text-white text-xs">{formatDuration(film.duration)}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="flex-grow py-2">
                                                 <div className="flex justify-between items-center">
                                                     <div>
                                                         <h3 className="text-xl font-bold">{film.title}</h3>
-                                                        <p className="text-sm text-gray-400"><ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} /> • {formatDistanceToNow(new Date(film.createdAt), { addSuffix: true })}</p>
+                                                        <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} />
+                                                        <p className="text-xs text-gray-400">{film.views || 0} views • {formatDistanceToNow(new Date(film.createdAt), { addSuffix: true })}</p>
                                                     </div>
                                                     <div className="flex space-x-2 items-center">
                                                         <Vote filmId={film._id} />
                                                         <Comment filmId={film._id} />
-                                                        <button className="text-crispWhite border border-steelGray px-3 py-2 rounded-full hover:text-cornflowerBlue">
+                                                        {/* <button className="text-crispWhite border border-steelGray px-3 py-2 rounded-full hover:text-cornflowerBlue">
                                                             <FiSend className="text-xl" />
-                                                        </button>
+                                                        </button> */}
                                                     </div>
                                                 </div>
                                             </div>
