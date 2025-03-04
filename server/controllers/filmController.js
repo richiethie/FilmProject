@@ -559,3 +559,26 @@ exports.getSeriesByFilmId = async (req, res) => {
       res.status(500).json({ error: 'Server error' });
   }
 };
+
+exports.updateFilm = async (req, res) => {
+  const { filmId } = req.params;
+  const updateData = req.body;
+
+  try {
+      // Find the film by ID and update with the new data
+      const updatedFilm = await Film.findByIdAndUpdate(
+          filmId,
+          { $set: updateData },
+          { new: true, runValidators: true } // Return the updated document and validate the data
+      );
+
+      if (!updatedFilm) {
+          return res.status(404).json({ message: "Film not found." });
+      }
+
+      res.status(200).json({ message: "Film updated successfully.", film: updatedFilm });
+  } catch (err) {
+      console.error("Error updating film:", err);
+      res.status(500).json({ message: "Internal server error.", error: err.message });
+  }
+};

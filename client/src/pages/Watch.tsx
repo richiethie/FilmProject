@@ -142,7 +142,6 @@ const Watch = () => {
                     axios.get(`${apiBaseUrl}/api/films/genre/${film.genre}`),
                     axios.get(`${apiBaseUrl}/api/users/${film.uploadedBy._id}`)
                 ]);
-                console.log(userResponse.data);
                 setOtherFilms(otherFilmsResponse.data);
                 setUser(userResponse.data);
             } catch (error) {
@@ -319,7 +318,7 @@ const Watch = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div onClick={() => setOpenSeries(true)} className='flex justify-between items-center gap-2 py-4 px-4 mb-4 mt-2 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl'>
+                                    <div onClick={() => navigate(`/series/${series?._id}`)} className='flex justify-between items-center gap-2 py-4 px-4 mb-4 mt-2 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl'>
                                         <div className='w-24 h-16 overflow-hidden rounded-md cursor-pointer group'>
                                             <img
                                                 src={series?.films[0]?.thumbnailUrl}
@@ -523,17 +522,7 @@ const Watch = () => {
                                 </div>
                             </div>
                             {/* Film Details */}
-                            <div className="bg-darkCharcoal rounded-lg p-6 shadow-inner shadow-secondary mt-4 mb-8">
-                                <h2 className="text-2xl font-bold mb-4">Description</h2>
-                                <p className="text-md">{film.description || 'No description provided.'}</p>
-                                <p className='text-md text-steelGray'>Uploaded on {format(new Date(film.createdAt), 'MMMM d, yyyy')}</p>
-        
-                                <h3 className="text-xl font-semibold mt-6 mb-2">Genre</h3>
-                                <p className="text-lg">{film.genre || 'Not specified.'}</p>
-        
-                                <h3 className="text-xl font-semibold mt-6 mb-2">Duration</h3>
-                                <p className="text-lg">{film.duration ? `${film.duration} minutes` : 'Not available.'}</p>
-                            </div>
+                            <FilmDetails film={film} />
         
                             {/* Film Series, if it is part of a series */}
                             {film.series && film.series.title && (
@@ -576,7 +565,7 @@ const Watch = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div onClick={() => setOpenSeries(true)} className='flex justify-between items-center gap-2 py-4 px-16 mb-8 mt-4 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl'>
+                                        <div onClick={() => navigate(`/series/${series?._id}`)} className='flex justify-between items-center gap-2 py-4 px-16 mb-8 mt-4 bg-darkCharcoal text-crispWhite transition-shadow duration-300 cursor-pointer hover:shadow-lg rounded-xl'>
                                             <div className='w-48 h-32 overflow-hidden rounded-md cursor-pointer group'>
                                                 <img
                                                     src={series?.films[0]?.thumbnailUrl}
@@ -601,7 +590,7 @@ const Watch = () => {
                             )}
                             {/* Comments Section */}
                             <div className="w-full mt-12 bg-charcoal border-t border-steelGray pt-8">
-                                <h3 className="text-2xl font-semibold mb-6">{comments.length} Comments</h3>
+                                <h3 className="text-xl font-semibold mb-6">{comments.length} Comments</h3>
         
                                 {/* Comment Form */}
                                 <form onSubmit={handleCommentSubmit} className="mb-6">

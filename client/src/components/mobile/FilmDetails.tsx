@@ -12,7 +12,7 @@ const FilmDetails = ({ film }: FilmDetailProps) => {
 
   const getFirstWords = (text: string, maxWords: number = 5) => {
     const words = text.split(" ");
-    return words.length > maxWords ? `${words.slice(0, maxWords).join(" ")} ...` : text;
+    return words.length > maxWords ? `${words.slice(0, maxWords).join(" ")} ` : text;
   };
 
   return (
@@ -23,7 +23,7 @@ const FilmDetails = ({ film }: FilmDetailProps) => {
             {!isOpen && (
                 <p className="text-sm text-steelGray">
                     {getFirstWords(film.description || "No description provided.")}
-                    <span className="text-crispWhite text-xs"> see more</span>
+                    <span className="text-crispWhite text-xs"> ...see more</span>
                 </p>
             )}
         </div>
@@ -37,7 +37,7 @@ const FilmDetails = ({ film }: FilmDetailProps) => {
           <p className="text-sm text-steelGray">{film.genre || "Not specified."}</p>
 
           <h3 className="text-lg mt-2">Duration</h3>
-          <p className="text-sm text-steelGray">{film.duration ? `${film.duration} minutes` : "Not available."}</p>
+          <p className="text-sm text-steelGray">{film.duration ? `${film.duration} seconds` : "Not available."}</p>
         </div>
       </Collapsible.Content>
     </Collapsible.Root>

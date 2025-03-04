@@ -9,6 +9,7 @@ import { Film } from "../types/Film";
 import { Series } from "@/types/Series";
 import { useIsMobile } from "@/context/MobileContext";
 import Loading from "@/pages/Loading";
+import { useNavigate } from "react-router-dom";
 
 interface UploadFilmListProps {
     handleSubmit: (e: React.FormEvent) => void; // Function to handle final submission
@@ -25,6 +26,7 @@ const UploadFilmList = (props: UploadFilmListProps) => {
     const [error, setError] = useState<string | null>(null);
     const { userId, token } = useAuth();
     const isMobile = useIsMobile();
+    const navigate = useNavigate();
 
     // Modal state
     const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
@@ -169,7 +171,7 @@ const UploadFilmList = (props: UploadFilmListProps) => {
                 <div className="relative h-full">
                     <div 
                         className="relative group mr-4" 
-                        onClick={() => handleThumbnailClick(film)}
+                        onClick={() => navigate(`/films/${film._id}`)}
                     >
                         <img
                             src={film.thumbnailUrl}
@@ -218,7 +220,7 @@ const UploadFilmList = (props: UploadFilmListProps) => {
                                 Add to Series
                             </li>
                             <li
-                                onClick={() => console.log("Edit", film.title)}
+                                onClick={() => navigate(`/edit-film/${film._id}`)}
                                 className="px-4 py-2 text-sm cursor-pointer hover:bg-[#212c38] flex items-center"
                             >
                                 <MdEdit className="text-xl mr-2" />

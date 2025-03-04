@@ -168,10 +168,10 @@ const Explore = () => {
     return (
         <div className="min-h-screen flex flex-col bg-charcoal text-crispWhite">
             <FeedHeader />
-            <main className={`flex-grow container ${isMobile ? ("w-full") : ("max-w-[80%]")} mx-auto py-2`}>
+            <main className={`flex-grow container ${isMobile ? ("w-full") : ("max-w-[95%]")} mx-auto py-2`}>
                 {/* Toggle View Mode */}
                 <Tabs.Root lazyMount unmountOnExit defaultValue="films">
-                    <Tabs.List className='mb-2'>
+                    <Tabs.List className={`mb-2 ${!isMobile && ("flex justify-center")}`}>
                         <Tabs.Trigger className='p-4' value="films">Films</Tabs.Trigger>
                         <Tabs.Trigger className='p-4' value="users">Users</Tabs.Trigger>
                         <Tabs.Trigger className='p-4' value="series">Series</Tabs.Trigger>
@@ -187,7 +187,7 @@ const Explore = () => {
                             <div 
                                 className={`${!isMobile && ("grid gap-6")}`}
                                 style={{
-                                    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
                                     maxWidth: '100%',
                                 }}
                             >
@@ -249,27 +249,47 @@ const Explore = () => {
 
                                             <div key={film._id} className="bg-charcoal rounded-lg overflow-hidden mt-8 group">
                                                 <div className="relative w-full pb-[60%] cursor-pointer" onClick={() => navigate(`/films/${film._id}`)}>
-                                                    <img
-                                                        src={film.thumbnailUrl}
-                                                        alt={film.title}
-                                                        className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg"
-                                                    />
-                                                    <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                                        <FaPlay className="text-crispWhite text-4xl"/>
-                                                    </div>
+                                                    {activeVideo === film._id ? (
+                                                        <video
+                                                            src={film.filmUrl}
+                                                            muted
+                                                            loop
+                                                            className="absolute top-0 left-0 w-full h-full object-cover rounded-lg video"
+                                                            autoPlay={activeVideo === film._id}
+                                                            playsInline
+                                                            onMouseLeave={() => setActiveVideo('')}
+                                                        />
+                                                    ) : (
+                                                        <img
+                                                            src={film.thumbnailUrl}
+                                                            alt={film.title}
+                                                            className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg"
+                                                            onMouseEnter={() => setActiveVideo(film._id)}
+                                                        />
+                                                    )}
+                                                    {activeVideo === film._id && remainingTime !== null ? (
+                                                        <div className="duration-overlay absolute bottom-1 right-1 bg-black bg-opacity-60 px-1 rounded-lg">
+                                                            <span className="text-white text-xs">{formatDuration(remainingTime)}</span>
+                                                        </div>
+                                                    ): (
+                                                        <div className="duration-overlay absolute bottom-1 right-1 bg-black bg-opacity-60 px-1 rounded-lg">
+                                                            <span className="text-white text-xs">{formatDuration(film.duration)}</span>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <div className="flex-grow p-4">
+                                                <div className="flex-grow py-2">
                                                     <div className="flex justify-between items-center">
                                                         <div>
                                                             <h3 className="text-xl font-bold">{film.title}</h3>
                                                             <ProfileLink username={film.uploadedBy.username} userId={film.uploadedBy._id} />
+                                                            <p className="text-xs text-gray-400">{film.views || 0} views • {formatDistanceToNow(new Date(film.createdAt), { addSuffix: true })}</p>
                                                         </div>
                                                         <div className="flex space-x-4 items-center">
                                                             <Vote filmId={film._id} />
                                                             <Comment filmId={film._id}/>
-                                                            <button className="text-crispWhite hover:text-cornflowerBlue">
+                                                            {/* <button className="text-crispWhite hover:text-cornflowerBlue">
                                                                 <FiSend className="text-2xl" />
-                                                            </button>
+                                                            </button> */}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -282,16 +302,37 @@ const Explore = () => {
                     </Tabs.Content>
 
                     <Tabs.Content value='users'>
-                        <div>
-                            <h1 className={`font-bold mb-6 ${isMobile ? ("ml-2 text-xl") : ("text-4xl")}`}>Recommended Users</h1>
-                            <div className="grid gap-6 grid-cols-1">
-                                {filteredUsers?.map((user, index) => (
-                                    <div key={user._id} className={`bg-charcoal rounded-lg overflow-hidden ${user.topCreator === false ? ("py-4 px-4") : ("px-2")}`}>
-                                        {user.topCreator === true ? (
-                                            <div className='bg-darkCharcoal px-2 py-2 rounded-lg'>
+                        <div className={`${!isMobile && ("flex flex-col justify-center items-center w-full")}`}>
+                            <div className={`${!isMobile && ("w-[672px] mx-auto")}`}>
+                                <h1 className={`font-bold mb-6 ${isMobile ? ("ml-2 text-xl") : ("text-2xl")}`}>Recommended Users</h1>
+                                <div className="grid gap-6 grid-cols-1">
+                                    {filteredUsers?.map((user, index) => (
+                                        <div key={user._id} className={`bg-charcoal rounded-lg overflow-hidden ${user.topCreator === false ? ("py-4 px-4") : ("px-2")}`}>
+                                            {user.topCreator === true ? (
+                                                <div className='bg-darkCharcoal px-2 py-2 rounded-lg'>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className='flex items-center'>
+                                                            <img src={user.profilePhotoUrl || Astronaut} alt={user.username} className="w-16 h-16 rounded-full border border-fireOrange object-cover mr-4" />
+                                                            <div className='mb-2 text-xl'>
+                                                                <div className='text-sm'>
+                                                                    <ProfileLink username={user.username} userId={user._id} />
+                                                                </div>
+                                                                <p className="text-xs text-gray-400">{user.followersCount} followers • {user.uploadedFilmsCount} films</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <p className='text-xs text-center mt-2 mb-4  p-2 rounded-lg'>{user.bio || "This user may not have a bio, but they are still a top creator"}</p>
+                                                    </div>
+                                                    <div className='flex justify-center items-center my-2'>
+                                                        <FollowButton targetUserId={user._id || ''} token={token || ''} />
+                                                        <button className='bg-darkFireOrange px-3 py-1 ml-8 rounded-lg text-sm'>Achievements</button>
+                                                    </div>
+                                                </div>
+                                            ) : (
                                                 <div className="flex justify-between items-center">
                                                     <div className='flex items-center'>
-                                                        <img src={user.profilePhotoUrl || Astronaut} alt={user.username} className="w-16 h-16 rounded-full border border-fireOrange object-cover mr-4" />
+                                                        <img src={user.profilePhotoUrl || Astronaut} alt={user.username} className="w-12 h-12 rounded-full object-cover mr-4" />
                                                         <div className='mb-2 text-xl'>
                                                             <div className='text-sm'>
                                                                 <ProfileLink username={user.username} userId={user._id} />
@@ -299,33 +340,14 @@ const Explore = () => {
                                                             <p className="text-xs text-gray-400">{user.followersCount} followers • {user.uploadedFilmsCount} films</p>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div>
-                                                    <p className='text-xs text-center mt-2 mb-4  p-2 rounded-lg'>{user.bio || "This user may not have a bio, but they are still a top creator"}</p>
-                                                </div>
-                                                <div className='flex justify-center items-center my-2'>
-                                                    <FollowButton targetUserId={user._id || ''} token={token || ''} />
-                                                    <button className='bg-darkFireOrange px-3 py-1 ml-8 rounded-lg text-sm'>Achievements</button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex justify-between items-center">
-                                                <div className='flex items-center'>
-                                                    <img src={user.profilePhotoUrl || Astronaut} alt={user.username} className="w-12 h-12 rounded-full object-cover mr-4" />
-                                                    <div className='mb-2 text-xl'>
-                                                        <div className='text-sm'>
-                                                            <ProfileLink username={user.username} userId={user._id} />
-                                                        </div>
-                                                        <p className="text-xs text-gray-400">{user.followersCount} followers • {user.uploadedFilmsCount} films</p>
+                                                    <div className='ml-4'>
+                                                        <FollowButton targetUserId={user._id || ''} token={token || ''} />
                                                     </div>
                                                 </div>
-                                                <div className='ml-4'>
-                                                    <FollowButton targetUserId={user._id || ''} token={token || ''} />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </Tabs.Content>
